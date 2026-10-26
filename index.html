@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>محمود أعرج — مخرج بصري ومونتير</title>
+<meta name="description" content="معرض أعمال محمود أعرج: إخراج بصري، تصوير، مونتاج وتصحيح ألوان.">
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+<meta name="googlebot" content="noindex, nofollow">
+<meta name="theme-color" content="#0b0b0c">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;600&family=Reem+Kufi:wght@500;700&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230b0b0c'/%3E%3Cpath d='M12 9l12 7-12 7z' fill='%23e8b866'/%3E%3C/svg%3E">
+<style>
+:root{
+  --bg:#0b0b0c; --ink:#f2efe9; --mute:#9a968d; --line:rgba(242,239,233,.12); --gold:#e8b866;
+  --ease:cubic-bezier(.22,.8,.2,1);          /* دخول ناعم */
+  --ease-io:cubic-bezier(.65,0,.35,1);       /* دخول/خروج */
+  --pad:clamp(16px,4vw,56px);
+}
+*{box-sizing:border-box;margin:0}
+html{scroll-behavior:smooth;background:var(--bg)}
+body{background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans Arabic",system-ui,sans-serif;font-weight:300;line-height:1.7;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+body.lock{overflow:hidden}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+.display{font-family:"Reem Kufi",sans-serif;font-weight:700}
+
+/* header */
+header{position:absolute;inset:0 0 auto 0;z-index:30;display:flex;justify-content:space-between;align-items:center;padding:18px var(--pad);
+  background:linear-gradient(#0b0b0cd9,transparent);pointer-events:none}
+header>*{pointer-events:auto}
+.logo{font-size:1.35rem;letter-spacing:.02em}
+.logo i{color:var(--gold);font-style:normal}
+.social{display:flex;gap:6px}
+.social a{padding:6px 12px;font-size:.85rem;border:1px solid var(--line);border-radius:99px;backdrop-filter:blur(8px);background:#0b0b0c66;transition:border-color .5s var(--ease),color .5s var(--ease),transform .5s var(--ease)}
+.social a:hover{border-color:var(--gold);color:var(--gold);transform:translateY(-2px)}
+
+/* hero: كاميرا بطيئة في عمق Z بدل صورة ثابتة */
+.hero{position:relative;height:100svh;min-height:520px;overflow:hidden;display:flex;align-items:flex-end}
+.slide{position:absolute;inset:-4%;background-size:cover;background-position:center;opacity:0;transform:scale(1.02) translate3d(0,0,0);
+  transition:opacity 1.6s var(--ease-io)}
+.slide.on{opacity:1;animation:dolly 9s var(--ease-io) forwards}
+@keyframes dolly{from{transform:scale(1.02) translate3d(1.2%,.6%,0)}to{transform:scale(1.14) translate3d(-1.5%,-.8%,0)}}
+.hero::after{content:"";position:absolute;inset:0;background:
+  radial-gradient(120% 90% at 50% 40%,transparent 35%,#0b0b0ccc 100%),linear-gradient(transparent 45%,var(--bg) 100%)}
+.hero-inner{position:relative;z-index:2;padding:0 var(--pad) clamp(40px,9vh,96px);width:100%;display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap}
+.hero h1{font-size:clamp(2.6rem,9vw,7.5rem);line-height:1;letter-spacing:-.01em}
+.hero p{color:var(--mute);margin-top:14px;max-width:34ch;font-size:clamp(.95rem,1.6vw,1.1rem)}
+.reel{display:flex;align-items:center;gap:14px;padding:10px 22px 10px 12px;border-radius:99px;background:var(--ink);color:#111;font-weight:600;transition:transform .6s var(--ease),background .6s var(--ease)}
+.reel:hover{transform:scale(1.05);background:var(--gold)}
+.reel svg{width:38px;height:38px;padding:11px;border-radius:50%;background:#111;fill:var(--ink);transition:transform .6s var(--ease)}
+.reel:hover svg{transform:rotate(-360deg) scale(.95)}
+.scroll{position:absolute;z-index:2;left:var(--pad);bottom:28px;writing-mode:vertical-rl;font-size:.7rem;letter-spacing:.3em;color:var(--mute)}
+
+/* filter */
+.bar{position:sticky;top:0;z-index:20;display:flex;gap:6px;overflow-x:auto;padding:14px var(--pad);background:#0b0b0cea;backdrop-filter:blur(14px);border-bottom:1px solid var(--line);scrollbar-width:none}
+.bar::-webkit-scrollbar{display:none}
+.chip{flex:none;padding:6px 16px;border-radius:99px;color:var(--mute);font-size:.9rem;border:1px solid transparent;transition:color .5s var(--ease),border-color .5s var(--ease),background .5s var(--ease)}
+.chip:hover{color:var(--ink)}
+.chip[aria-pressed=true]{color:#111;background:var(--ink)}
+.chip small{opacity:.55;margin-inline-start:6px}
+
+/* grid بلا كروت: إطارات لقطات متدفقة */
+main{padding:clamp(24px,5vw,64px) var(--pad) 80px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr));grid-auto-flow:dense;gap:clamp(10px,1.4vw,20px)}
+.work{position:relative;aspect-ratio:16/9;overflow:hidden;border-radius:4px;background:#161617;text-align:start;display:block;width:100%;
+  opacity:0;transform:translateY(34px);transition:opacity 1s var(--ease),transform 1s var(--ease)}
+.work.in{opacity:1;transform:none}
+.work.wide{grid-column:span 2;grid-row:span 2;aspect-ratio:auto}
+@media(max-width:700px){.work.wide{grid-column:auto;grid-row:auto;aspect-ratio:16/9}}
+.work img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scale(1.001);transition:transform 1.4s var(--ease),filter 1s var(--ease);filter:saturate(.85) brightness(.82)}
+.work:hover img,.work:focus-visible img{transform:scale(1.09);filter:saturate(1.08) brightness(1)}
+.work::after{content:"";position:absolute;inset:0;background:linear-gradient(transparent 40%,#0b0b0cf2)}
+.meta{position:absolute;z-index:2;inset:auto 0 0 0;padding:16px 18px;display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
+.meta h3{font-size:clamp(1rem,1.6vw,1.2rem);font-weight:600;line-height:1.35;transform:translateY(8px);transition:transform .8s var(--ease)}
+.meta .cat{display:block;font-size:.72rem;color:var(--gold);opacity:.9}
+.work:hover h3{transform:none}
+.num{font-family:"Reem Kufi";font-size:.85rem;color:var(--mute);direction:ltr;opacity:.8}
+.play{position:absolute;z-index:2;top:50%;left:50%;width:62px;height:62px;margin:-31px;border-radius:50%;border:1px solid #fff9;display:grid;place-items:center;
+  opacity:0;transform:scale(.6);transition:opacity .6s var(--ease),transform .8s var(--ease);backdrop-filter:blur(6px);background:#0b0b0c55}
+.play svg{width:20px;fill:#fff;margin-inline-start:-3px}
+.work:hover .play,.work:focus-visible .play{opacity:1;transform:none}
+@media(hover:none){.play{opacity:.9;transform:none;width:48px;height:48px;margin:-24px}}
+
+/* theater */
+.theater{position:fixed;inset:0;z-index:100;display:grid;place-items:center;padding:clamp(10px,3vw,40px);
+  background:#050506f2;backdrop-filter:blur(18px);opacity:0;visibility:hidden;transition:opacity .6s var(--ease-io),visibility 0s .6s}
+.theater.open{opacity:1;visibility:visible;transition:opacity .6s var(--ease-io)}
+.stage{width:min(100%,calc((100svh - 130px)*16/9));transform:scale(.94) translateY(20px);transition:transform .9s var(--ease)}
+.theater.open .stage{transform:none}
+.frame{position:relative;aspect-ratio:16/9;background:#000;border-radius:6px;overflow:hidden;box-shadow:0 40px 120px #000}
+.frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.cap{display:flex;justify-content:space-between;align-items:center;margin-top:14px;gap:16px}
+.cap h2{font-size:clamp(1rem,2.2vw,1.4rem);font-weight:600}
+.cap small{color:var(--gold)}
+.x{position:absolute;top:14px;inset-inline-start:14px;width:44px;height:44px;border-radius:50%;border:1px solid var(--line);font-size:1.3rem;transition:transform .6s var(--ease),border-color .6s var(--ease)}
+.x:hover{transform:rotate(90deg);border-color:var(--gold)}
+.nav{display:flex;gap:8px}
+.nav button{width:42px;height:42px;border-radius:50%;border:1px solid var(--line);transition:border-color .5s var(--ease),transform .5s var(--ease)}
+.nav button:hover{border-color:var(--gold);transform:scale(1.08)}
+
+footer{padding:clamp(60px,12vw,140px) var(--pad) 48px;border-top:1px solid var(--line);text-align:center}
+footer h2{font-size:clamp(1.8rem,6vw,4.5rem);line-height:1.1}
+footer h2 a{color:var(--gold);border-bottom:2px solid transparent;transition:border-color .6s var(--ease)}
+footer h2 a:hover{border-color:var(--gold)}
+footer .social{justify-content:center;margin-top:28px}
+footer p{color:var(--mute);font-size:.8rem;margin-top:48px}
+.empty{color:var(--mute);padding:60px 0;text-align:center}
+
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition-duration:.01ms!important}
+  .work{opacity:1;transform:none}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <a class="logo display" href="#top" aria-label="محمود أعرج">محمود <i>أعرج</i></a>
+  <nav class="social" aria-label="التواصل">
+    <a href="https://wa.me/963930368639" target="_blank" rel="noopener noreferrer">واتساب</a>
+    <a href="https://www.instagram.com/mahmoud.a3raj" target="_blank" rel="noopener noreferrer">إنستغرام</a>
+    <a href="https://www.facebook.com/share/1HL4izGx1m/" target="_blank" rel="noopener noreferrer">فيسبوك</a>
+  </nav>
+</header>
+
+<section class="hero" id="top" aria-label="مقدمة">
+  <div id="slides" aria-hidden="true"></div>
+  <div class="hero-inner">
+    <div>
+      <h1 class="display">إخراج. مونتاج.<br>لون.</h1>
+      <p>مخرج بصري وصانع أفلام ومونتير ومصحح ألوان بخبرة تتجاوز ١١ عاماً.</p>
+    </div>
+    <button class="reel" id="reel" type="button">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4l13 8-13 8z"/></svg>
+      <span>شاهد الأعمال</span>
+    </button>
+  </div>
+  <div class="scroll" aria-hidden="true">SCROLL</div>
+</section>
+
+<div class="bar" id="bar" role="toolbar" aria-label="تصفية الأعمال"></div>
+
+<main>
+  <div class="grid" id="grid"></div>
+  <p class="empty" id="empty" hidden>تعذّر تحميل الأعمال.</p>
+</main>
+
+<footer id="contact">
+  <h2 class="display">لنصنع <a href="https://wa.me/963930368639" target="_blank" rel="noopener noreferrer">لقطتك القادمة</a></h2>
+  <nav class="social" aria-label="التواصل">
+    <a href="https://wa.me/963930368639" target="_blank" rel="noopener noreferrer">واتساب</a>
+    <a href="https://www.instagram.com/mahmoud.a3raj" target="_blank" rel="noopener noreferrer">إنستغرام</a>
+    <a href="https://www.facebook.com/share/1HL4izGx1m/" target="_blank" rel="noopener noreferrer">فيسبوك</a>
+  </nav>
+  <p>© محمود أعرج</p>
+</footer>
+
+<div class="theater" id="theater" role="dialog" aria-modal="true" aria-label="مشغل الفيديو" aria-hidden="true">
+  <button class="x" id="close" type="button" aria-label="إغلاق">✕</button>
+  <div class="stage">
+    <div class="frame" id="frame"></div>
+    <div class="cap">
+      <div><h2 id="capTitle"></h2><small id="capCat"></small></div>
+      <div class="nav">
+        <button id="next" type="button" aria-label="التالي">→</button>
+        <button id="prev" type="button" aria-label="السابق">←</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(()=>{
+const $=s=>document.querySelector(s);
+const thumb=(id,w=800)=>`https://drive.google.com/thumbnail?id=${id}&sz=w${w}`;
+const preview=id=>`https://drive.google.com/file/d/${id}/preview`;
+const pad=n=>String(n).padStart(2,"0");
+const esc=s=>s.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+let works=[],view=[],cur=-1,lastFocus=null;
+
+/* ---------- الهيرو: لقطات متبدلة مع دوللي بطيء ---------- */
+function startHero(){
+  const box=$("#slides");
+  const step=Math.max(1,Math.floor(works.length/5));
+  works.filter((_,i)=>i%step===0).slice(0,5).forEach(w=>{
+    const d=document.createElement("div");d.className="slide";
+    d.style.backgroundImage=`url(${thumb(w.id,1600)})`;box.appendChild(d);
+  });
+  const s=[...box.children];if(!s.length)return;
+  let k=0;s[0].classList.add("on");
+  if(matchMedia("(prefers-reduced-motion:reduce)").matches)return;
+  setInterval(()=>{
+    s[k].classList.remove("on");k=(k+1)%s.length;
+    s[k].style.animation="none";void s[k].offsetWidth;s[k].style.animation="";s[k].classList.add("on");
+  },7000);
+}
+
+/* ---------- التصفية ---------- */
+function buildBar(){
+  const cats=[...new Set(works.map(w=>w.category))];
+  const bar=$("#bar");
+  const mk=(label,val,n)=>{
+    const b=document.createElement("button");b.type="button";b.className="chip";
+    b.setAttribute("aria-pressed",val==="");b.dataset.v=val;
+    b.innerHTML=`${esc(label)}<small>${n}</small>`;return b;
+  };
+  bar.append(mk("الكل","",works.length),...cats.map(c=>mk(c,c,works.filter(w=>w.category===c).length)));
+  bar.addEventListener("click",e=>{
+    const b=e.target.closest(".chip");if(!b)return;
+    bar.querySelectorAll(".chip").forEach(x=>x.setAttribute("aria-pressed",x===b));
+    render(b.dataset.v);
+  });
+}
+
+/* ---------- الشبكة ---------- */
+const io=new IntersectionObserver(es=>es.forEach(e=>{
+  if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target)}
+}),{rootMargin:"0px 0px -6% 0px"});
+
+function render(cat){
+  view=cat?works.filter(w=>w.category===cat):works;
+  const g=$("#grid");g.textContent="";
+  const frag=document.createDocumentFragment();
+  view.forEach((w,i)=>{
+    const b=document.createElement("button");
+    b.type="button";b.className="work"+(i%7===0&&view.length>2?" wide":"");
+    b.style.transitionDelay=`${(i%4)*70}ms`;
+    b.setAttribute("aria-label",`تشغيل: ${w.title}`);
+    b.innerHTML=`<img loading="lazy" decoding="async" referrerpolicy="no-referrer" alt="" src="${thumb(w.id,i%7===0?1000:640)}">
+      <span class="play"><svg viewBox="0 0 24 24"><path d="M7 4l13 8-13 8z"/></svg></span>
+      <span class="meta"><span><span class="cat">${esc(w.category)}</span><h3>${esc(w.title)}</h3></span><span class="num">${pad(i+1)}</span></span>`;
+    b.addEventListener("click",()=>open(i));
+    b.querySelector("img").addEventListener("error",e=>e.target.remove());
+    frag.appendChild(b);
+  });
+  g.appendChild(frag);
+  g.querySelectorAll(".work").forEach(el=>io.observe(el));
+}
+
+/* ---------- المسرح ---------- */
+const th=$("#theater"),frame=$("#frame");
+function open(i){
+  if(cur<0)lastFocus=document.activeElement;
+  cur=(i+view.length)%view.length;const w=view[cur];
+  frame.textContent="";
+  const f=document.createElement("iframe");
+  f.src=preview(w.id);f.allow="autoplay; fullscreen";f.allowFullscreen=true;f.title=w.title;
+  frame.appendChild(f);
+  $("#capTitle").textContent=w.title;$("#capCat").textContent=w.category;
+  th.classList.add("open");th.setAttribute("aria-hidden","false");document.body.classList.add("lock");
+  $("#close").focus({preventScroll:true});
+}
+function close(){
+  if(cur<0)return;cur=-1;
+  frame.textContent="";                     // تفريغ الـ iframe فوراً لإيقاف الصوت
+  th.classList.remove("open");th.setAttribute("aria-hidden","true");document.body.classList.remove("lock");
+  lastFocus&&lastFocus.focus({preventScroll:true});
+}
+$("#close").onclick=close;
+th.addEventListener("click",e=>{if(e.target===th)close()});
+$("#next").onclick=()=>open(cur+1);
+$("#prev").onclick=()=>open(cur-1);
+addEventListener("keydown",e=>{
+  if(cur<0)return;
+  if(e.key==="Escape")close();
+  else if(e.key==="ArrowLeft")open(cur+1);      // RTL: اليسار = التالي
+  else if(e.key==="ArrowRight")open(cur-1);
+});
+addEventListener("pagehide",close);
+$("#reel").onclick=()=>$("#bar").scrollIntoView({behavior:"smooth"});
+
+/* ---------- تحميل ---------- */
+fetch("works.json").then(r=>r.json()).then(d=>{
+  works=d;if(!works.length)throw 0;
+  startHero();buildBar();render("");
+}).catch(()=>{$("#empty").hidden=false});
+})();
+</script>
+</body>
+</html>
