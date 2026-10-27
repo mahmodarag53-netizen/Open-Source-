@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Crawl the public Drive folders and write works.json (recursive, no API key)."""
-import html, json, re, sys, urllib.request
+import datetime, html, json, os, re, sys, urllib.request
 
 ROOTS = [
     ("1wvwrs7ryTm5PdZeORaMOhRSr8jOHLjJY", "المشاريع الأساسية"),
@@ -31,9 +31,17 @@ def walk(fid, trail, out, seen):
 
 
 def main():
+    old = {}
+    if os.path.exists("works.json"):
+        old = {w["id"]: w.get("added") for w in json.load(open("works.json", encoding="utf-8"))}
     out, seen = [], set()
-    for fid, name in ROOTS:
+    for fid, name in ROOTS:          # أي خطأ شبكة يوقف المزامنة دون المساس بالملف الحالي
         walk(fid, [name], out, seen)
+    if not out:
+        sys.exit("no videos found, keeping existing works.json")
+    now = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    for w in out:                    # تاريخ الإضافة: يُسجَّل فقط للفيديوهات الجديدة بعد أول مزامنة
+        w["added"] = old.get(w["id"]) if w["id"] in old else (now if old else None)
     json.dump(out, open("works.json", "w", encoding="utf-8"), ensure_ascii=False, indent=1)
     print(f"{len(out)} videos", file=sys.stderr)
 

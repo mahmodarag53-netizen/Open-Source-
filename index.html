@@ -8,6 +8,8 @@
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
 <meta name="googlebot" content="noindex, nofollow">
 <meta name="theme-color" content="#0b0b0c">
+<link rel="preconnect" href="https://drive.google.com">
+<link rel="preconnect" href="https://lh3.googleusercontent.com" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;800&display=swap" rel="stylesheet">
@@ -66,6 +68,9 @@ main{padding:clamp(24px,5vw,64px) var(--pad) 80px}
   opacity:0;transform:translateY(34px);transition:opacity 1s var(--ease),transform 1s var(--ease),outline-color .8s var(--ease)}
 .frame.in{opacity:1;transform:none}
 .frame:hover{outline-color:#e8b86655}
+.frame::before{content:"";position:absolute;inset:0;background:linear-gradient(100deg,#0e0e10 30%,#1a1a1e 50%,#0e0e10 70%);background-size:300% 100%;animation:sk 2.2s var(--ease-io) infinite}
+@keyframes sk{from{background-position:100% 0}to{background-position:0 0}}
+.new{position:absolute;z-index:3;top:10px;inset-inline-start:10px;padding:1px 10px;border-radius:99px;background:var(--gold);color:#111;font-size:.7rem;font-weight:600}
 /* زوايا الإطار */
 .frame i{position:absolute;z-index:3;width:18px;height:18px;border:2px solid var(--gold);pointer-events:none;transition:width .7s var(--ease),height .7s var(--ease)}
 .frame i:nth-child(1){top:-8px;right:-8px;border-left:0;border-bottom:0}
@@ -136,7 +141,7 @@ footer p{color:var(--mute);font-size:.8rem;margin-top:48px}
 <section class="intro" id="top">
   <h1 class="sr">Mahmoud Araj</h1>
   <div class="sub" id="sub">
-    <p class="role" dir="ltr">Senior Editor</p>
+    <p class="role" id="role" dir="ltr">Senior Editor</p>
     <p class="gal">معرض الأعمال</p>
     <a class="pill cv" href="https://drive.google.com/file/d/194y-hcqcrfn_JpsfyU2jkBr3UbCX6mK3/view?usp=drive_link" target="_blank" rel="noopener noreferrer">نبذة عني</a>
   </div>
@@ -296,12 +301,14 @@ function render(cat){
     b.style.transitionDelay=`${(i%4)*70}ms`;
     b.setAttribute("aria-label",`تشغيل العمل ${pad(i+1)}`);
     const u=thumb(w.id,640);
-    b.innerHTML=`<i></i><i></i><i></i><i></i>
+    const isNew=w.added&&Date.now()-Date.parse(w.added)<14*864e5;
+    b.innerHTML=`${isNew?'<span class="new">جديد</span>':""}<i></i><i></i><i></i><i></i>
       <span class="screen"><span class="bgimg" style="background-image:url(${u})"></span><img loading="lazy" decoding="async" referrerpolicy="no-referrer" alt="" src="${u}"></span>
       <span class="play"><svg viewBox="0 0 24 24"><path d="M7 4l13 8-13 8z"/></svg></span>
       <span class="meta"><span class="cat">${esc(w.category)}</span><span class="num">${pad(i+1)}</span></span>`;
     b.addEventListener("click",()=>open(i));
-    b.querySelector("img").addEventListener("error",e=>e.target.remove());
+    const im=b.querySelector("img");let tries=0;
+    im.addEventListener("error",()=>{if(tries++<2)setTimeout(()=>{im.src=`${u}&r=${tries}`},1200*tries);else im.style.visibility="hidden"});
     frag.appendChild(b);
   });
   g.appendChild(frag);
@@ -319,13 +326,15 @@ function open(i){
   screen.appendChild(f);
   $("#drv").href=`https://drive.google.com/file/d/${w.id}/view`;
   $("#capCat").textContent=`${w.category} · ${pad(cur+1)} / ${pad(view.length)}`;
-  th.classList.add("open");th.setAttribute("aria-hidden","false");document.body.classList.add("lock");
+  th.classList.add("open");th.setAttribute("aria-hidden","false");document.body.classList.add("lock");$(".page").inert=true;
+  history.replaceState(null,"",`#w=${w.id}`);
   $("#close").focus({preventScroll:true});
 }
 function close(){
   if(cur<0)return;cur=-1;
   screen.textContent="";                    // تفريغ الـ iframe فوراً لإيقاف الصوت
-  th.classList.remove("open");th.setAttribute("aria-hidden","true");document.body.classList.remove("lock");
+  th.classList.remove("open");th.setAttribute("aria-hidden","true");document.body.classList.remove("lock");$(".page").inert=false;
+  history.replaceState(null,"",location.pathname+location.search);
   lastFocus&&lastFocus.focus({preventScroll:true});
 }
 $("#close").onclick=close;
@@ -334,16 +343,27 @@ $("#next").onclick=()=>open(cur+1);
 $("#prev").onclick=()=>open(cur-1);
 addEventListener("keydown",e=>{
   if(cur<0)return;
+  if(e.key==="Tab"){const f=[...th.querySelectorAll("button,a[href]")];const i=f.indexOf(document.activeElement);
+    e.preventDefault();f[(i+(e.shiftKey?-1:1)+f.length)%f.length].focus()}
   if(e.key==="Escape")close();
   else if(e.key==="ArrowLeft")open(cur+1);      // RTL: اليسار = التالي
   else if(e.key==="ArrowRight")open(cur-1);
 });
 addEventListener("pagehide",close);
 
-/* ---------- تحميل ---------- */
-fetch("works.json").then(r=>r.json()).then(d=>{
-  works=d;if(!works.length)throw 0;
+/* ---------- تحميل: works.json (من الدرايف) + overrides.json (تحكم لوحة الإدارة) ---------- */
+const getJSON=u=>fetch(`${u}?v=${Date.now()}`,{cache:"no-store"}).then(r=>{if(!r.ok)throw 0;return r.json()});
+Promise.all([getJSON("works.json"),getJSON("overrides.json").catch(()=>({}))]).then(([d,o])=>{
+  const hidden=new Set(o.hidden||[]),pin=o.pinned||[],cm=o.categories||{},s=o.settings||{};
+  if(s.role)$("#role").textContent=s.role;
+  if(s.cvUrl)document.querySelectorAll("a.cv").forEach(a=>a.href=s.cvUrl);
+  works=d.filter(w=>!hidden.has(w.id)).map(w=>({...w,category:cm[w.category]||w.category}));
+  const pi=id=>{const i=pin.indexOf(id);return i<0?1e6:i};
+  works=works.map((w,i)=>[w,i]).sort((a,b)=>pi(a[0].id)-pi(b[0].id)||a[1]-b[1]).map(x=>x[0]);
+  if(!works.length)throw 0;
   buildBar();render("");
+  const m=/^#w=([\w-]+)$/.exec(location.hash);          // رابط مباشر لعمل واحد
+  if(m){const i=works.findIndex(w=>w.id===m[1]);if(i>=0){view=works;open(i)}}
 }).catch(()=>{$("#empty").hidden=false});
 })();
 </script>

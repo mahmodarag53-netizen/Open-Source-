@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>لوحة التحكم — Mahmoud Araj</title>
+<meta name="robots" content="noindex, nofollow, noarchive">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0b0b0c;--panel:#131316;--ink:#f2efe9;--mute:#a19d94;--line:rgba(242,239,233,.14);--gold:#e8b866;--bad:#e5766b;--ok:#7fcf9b;--pad:clamp(16px,4vw,48px);--ease:cubic-bezier(.22,.8,.2,1)}
+*{box-sizing:border-box;margin:0}
+body{background:var(--bg);color:var(--ink);font-family:Cairo,system-ui,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer;background:none;border:1px solid var(--line);border-radius:99px;padding:6px 16px;transition:border-color .4s var(--ease),background .4s var(--ease),color .4s var(--ease)}
+button:hover:not(:disabled){border-color:var(--gold);color:var(--gold)}
+button:disabled{opacity:.4;cursor:default}
+a.btn{border:1px solid var(--line);border-radius:99px;padding:6px 16px;color:var(--ink);text-decoration:none;transition:border-color .4s var(--ease),color .4s var(--ease)}
+a.btn:hover{border-color:var(--gold);color:var(--gold)}
+button.main{background:var(--gold);border-color:var(--gold);color:#111;font-weight:600}
+button.main:hover:not(:disabled){background:var(--ink);border-color:var(--ink);color:#111}
+input,select{background:#0b0b0c;border:1px solid var(--line);border-radius:8px;padding:8px 12px;width:100%}
+input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+label{display:block;font-size:.85rem;color:var(--mute);margin-bottom:4px}
+.wrap{max-width:1200px;margin:0 auto;padding:0 var(--pad)}
+.login{max-width:480px;margin:12vh auto;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:28px}
+.login h1{font-size:1.6rem;margin-bottom:6px}
+.login p{color:var(--mute);font-size:.9rem;margin-bottom:16px}
+.login ol{color:var(--mute);font-size:.85rem;padding-inline-start:20px;margin:0 0 16px}
+.err{color:var(--bad);font-size:.9rem;margin-top:10px;min-height:1.4em}
+.top{position:sticky;top:0;z-index:10;background:#0b0b0cee;backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding-block:12px}
+.top h1{font-size:1.1rem}
+.acts{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.stat{display:flex;gap:18px;flex-wrap:wrap;color:var(--mute);font-size:.9rem;padding:16px 0}
+.stat b{color:var(--ink);font-weight:600}
+.run{font-size:.8rem;color:var(--mute)}
+section.box{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:18px}
+section.box h2{font-size:1rem;margin-bottom:12px}
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.cats{display:grid;gap:10px}
+.cat{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;align-items:center}
+.cat span{font-size:.85rem;color:var(--mute);overflow-wrap:anywhere}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 16px}
+.tabs button[aria-pressed=true]{background:var(--ink);color:#111;border-color:var(--ink)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;padding-bottom:90px}
+.it{background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden;display:flex;flex-direction:column;transition:opacity .4s var(--ease),border-color .4s var(--ease)}
+.it.off{opacity:.38}
+.it.pin{border-color:var(--gold)}
+.th{position:relative;aspect-ratio:1080/1920;background:#050506 center/contain no-repeat}
+.th img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+.th a{position:absolute;inset:0}
+.tag{position:absolute;top:6px;inset-inline-start:6px;background:var(--gold);color:#111;font-size:.68rem;font-weight:600;border-radius:99px;padding:0 8px}
+.pn{position:absolute;top:6px;inset-inline-end:6px;background:#000a;border-radius:99px;min-width:22px;text-align:center;font-size:.75rem}
+.ct{font-size:.7rem;color:var(--mute);padding:6px 10px 0;min-height:2.6em;line-height:1.35}
+.bt{display:flex;gap:6px;padding:8px 10px 10px}
+.bt button{flex:1;padding:4px 0;font-size:.8rem}
+.bt button.on{background:var(--gold);color:#111;border-color:var(--gold)}
+.toast{position:fixed;bottom:18px;inset-inline:0;margin:auto;width:max-content;max-width:90vw;background:var(--ink);color:#111;padding:10px 20px;border-radius:99px;font-weight:600;opacity:0;transform:translateY(20px);transition:all .6s var(--ease);pointer-events:none;z-index:50}
+.toast.on{opacity:1;transform:none}
+.toast.bad{background:var(--bad)}
+.bar{position:fixed;bottom:0;inset-inline:0;z-index:20;background:#0b0b0cf2;border-top:1px solid var(--line);padding:10px var(--pad);display:none;justify-content:space-between;align-items:center;gap:12px}
+.bar.on{display:flex}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+
+<div class="login" id="login">
+  <h1>لوحة التحكم</h1>
+  <p>تتحكم من هنا بما يراه الزائر في المعرض. الفيديوهات الجديدة في الدرايف تُضاف تلقائياً.</p>
+  <ol>
+    <li>افتح GitHub ← Settings ← Developer settings ← Fine-grained tokens ← Generate new token.</li>
+    <li>Repository access: هذا المستودع فقط.</li>
+    <li>Permissions: <b>Contents</b> و<b>Actions</b> بصلاحية Read and write.</li>
+  </ol>
+  <label for="tok">رمز GitHub (يُحفظ في متصفحك فقط)</label>
+  <input id="tok" type="password" autocomplete="off" dir="ltr" placeholder="github_pat_…">
+  <div class="err" id="loginErr" role="alert"></div>
+  <button class="main" id="go" type="button">دخول</button>
+</div>
+
+<div id="app" hidden>
+  <div class="top"><div class="wrap">
+    <h1>لوحة التحكم</h1>
+    <div class="acts">
+      <span class="run" id="run"></span>
+      <button id="sync" type="button">تحديث من الدرايف الآن</button>
+      <a class="btn" href="index.html" target="_blank" rel="noopener">عرض الموقع</a>
+      <button id="out" type="button">خروج</button>
+    </div>
+  </div></div>
+
+  <div class="wrap">
+    <div class="stat" id="stat"></div>
+
+    <section class="box">
+      <h2>إعدادات الصفحة</h2>
+      <div class="row">
+        <div><label for="role">المسمى تحت الاسم</label><input id="role" dir="ltr"></div>
+        <div><label for="cv">رابط السيرة الذاتية (نبذة عني)</label><input id="cv" dir="ltr"></div>
+      </div>
+    </section>
+
+    <section class="box">
+      <h2>أسماء الأقسام كما تظهر للزائر</h2>
+      <div class="cats" id="cats"></div>
+    </section>
+
+    <section class="box">
+      <h2>الأعمال</h2>
+      <div class="tabs" id="tabs" role="toolbar"></div>
+      <div class="grid" id="grid"></div>
+    </section>
+  </div>
+
+  <div class="bar" id="bar"><span id="dirty">توجد تغييرات غير محفوظة</span><div class="acts"><button id="rev" type="button">تراجع</button><button class="main" id="save" type="button">حفظ ونشر</button></div></div>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(()=>{
+const OWNER="mahmodarag53-netizen",REPO="Open-Source-",WF="pages.yml",FILE="overrides.json";
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+let token="",branch="main",works=[],ov={},base="",tab="all",toastT;
+const store={get(){try{return localStorage.getItem("gh")||""}catch(e){return""}},set(v){try{v?localStorage.setItem("gh",v):localStorage.removeItem("gh")}catch(e){}}};
+
+const api=(path,opt={})=>fetch(`https://api.github.com/repos/${OWNER}/${REPO}${path}`,{...opt,headers:{Accept:"application/vnd.github+json",Authorization:`Bearer ${token}`,"X-GitHub-Api-Version":"2022-11-28",...(opt.headers||{})}});
+function toast(m,bad){const t=$("#toast");t.textContent=m;t.className="toast on"+(bad?" bad":"");clearTimeout(toastT);toastT=setTimeout(()=>t.className="toast",4200)}
+const b64=s=>btoa(unescape(encodeURIComponent(s)));
+const fromB64=s=>decodeURIComponent(escape(atob(s.replace(/\n/g,""))));
+const norm=o=>({hidden:o.hidden||[],pinned:o.pinned||[],categories:o.categories||{},settings:{role:"Senior Editor",cvUrl:"",...(o.settings||{})}});
+
+async function login(){
+  token=$("#tok").value.trim()||token;$("#loginErr").textContent="";
+  const r=await api("").catch(()=>null);
+  if(!r||!r.ok){$("#loginErr").textContent=r&&r.status===401?"الرمز غير صحيح أو منتهي.":r&&r.status===404?"الرمز لا يملك صلاحية الوصول لهذا المستودع.":"تعذّر الاتصال بـ GitHub.";return}
+  const j=await r.json();branch=j.default_branch;
+  if(!j.permissions||!j.permissions.push){$("#loginErr").textContent="الرمز لا يملك صلاحية الكتابة (Contents: Read and write).";return}
+  store.set(token);await load();
+  $("#login").hidden=true;$("#app").hidden=false;
+}
+async function load(){
+  const bust=`?v=${Date.now()}`;
+  works=await fetch("works.json"+bust,{cache:"no-store"}).then(r=>r.json());
+  const r=await api(`/contents/${FILE}?ref=${branch}`);
+  if(r.ok){const j=await r.json();ov=norm(JSON.parse(fromB64(j.content)));}else ov=norm({});
+  base=JSON.stringify(ov);render();runs();
+}
+async function runs(){
+  const r=await api(`/actions/workflows/${WF}/runs?per_page=1`).catch(()=>null);
+  if(!r||!r.ok){$("#run").textContent="";return}
+  const j=await r.json(),x=j.workflow_runs&&j.workflow_runs[0];
+  if(!x){$("#run").textContent="";return}
+  const st=x.status!=="completed"?"قيد التنفيذ":x.conclusion==="success"?"نجح":"فشل";
+  $("#run").textContent=`آخر نشر: ${st} · ${new Date(x.updated_at).toLocaleString("ar")}`;
+}
+const dirty=()=>JSON.stringify(ov)!==base;
+const cats=()=>[...new Set(works.map(w=>w.category))];
+const isNew=w=>w.added&&Date.now()-Date.parse(w.added)<14*864e5;
+
+function render(){
+  const hid=new Set(ov.hidden),pin=ov.pinned;
+  const n=works.length,h=works.filter(w=>hid.has(w.id)).length;
+  $("#stat").innerHTML=`<span>إجمالي في الدرايف: <b>${n}</b></span><span>ظاهر للزائر: <b>${n-h}</b></span><span>مخفي: <b>${h}</b></span><span>مثبّت: <b>${pin.filter(id=>works.some(w=>w.id===id)).length}</b></span><span>جديد: <b>${works.filter(isNew).length}</b></span>`;
+  $("#role").value=ov.settings.role;$("#cv").value=ov.settings.cvUrl;
+  $("#cats").innerHTML=cats().map((c,i)=>`<div class="cat"><span>${esc(c)}</span><input data-c="${i}" value="${esc(ov.categories[c]||"")}" placeholder="الاسم الظاهر (اتركه فارغاً للإبقاء)"></div>`).join("");
+  const T=[["all","الكل"],["pin","المثبّتة"],["off","المخفية"],["new","الجديدة"]];
+  $("#tabs").innerHTML=T.map(([k,l])=>`<button type="button" data-t="${k}" aria-pressed="${tab===k}">${l}</button>`).join("");
+  let list=works;
+  if(tab==="pin")list=works.filter(w=>pin.includes(w.id)).sort((a,b)=>pin.indexOf(a.id)-pin.indexOf(b.id));
+  if(tab==="off")list=works.filter(w=>hid.has(w.id));
+  if(tab==="new")list=works.filter(isNew);
+  $("#grid").innerHTML=list.length?list.map(w=>{const p=pin.indexOf(w.id),off=hid.has(w.id);
+    return `<div class="it${off?" off":""}${p>=0?" pin":""}"><div class="th"><img loading="lazy" decoding="async" referrerpolicy="no-referrer" alt="" src="https://drive.google.com/thumbnail?id=${w.id}&sz=w320" data-id="${w.id}"><a href="https://drive.google.com/file/d/${w.id}/view" target="_blank" rel="noopener noreferrer" aria-label="فتح في الدرايف"></a>${isNew(w)?'<span class="tag">جديد</span>':""}${p>=0?`<span class="pn">${p+1}</span>`:""}</div><div class="ct">${esc(ov.categories[w.category]||w.category)}</div><div class="bt"><button type="button" class="${p>=0?"on":""}" data-p="${w.id}">${p>=0?"مثبّت":"تثبيت"}</button><button type="button" class="${off?"on":""}" data-h="${w.id}">${off?"مخفي":"إخفاء"}</button></div></div>`}).join(""):`<p style="color:var(--mute)">لا توجد أعمال في هذا التبويب.</p>`;
+  $("#bar").classList.toggle("on",dirty());
+}
+$("#grid").addEventListener("error",e=>{const im=e.target;if(im.tagName!=="IMG")return;const n=(+im.dataset.n||0)+1;im.dataset.n=n;
+  if(n<=3)setTimeout(()=>{im.src=`https://drive.google.com/thumbnail?id=${im.dataset.id}&sz=w320&r=${n}`},1500*n)},true);
+const tgl=(a,id)=>{const i=a.indexOf(id);i<0?a.push(id):a.splice(i,1)};
+
+$("#grid").addEventListener("click",e=>{
+  const p=e.target.closest("[data-p]"),h=e.target.closest("[data-h]");
+  if(p)tgl(ov.pinned,p.dataset.p);else if(h)tgl(ov.hidden,h.dataset.h);else return;
+  render();
+});
+$("#tabs").addEventListener("click",e=>{const b=e.target.closest("[data-t]");if(b){tab=b.dataset.t;render()}});
+$("#cats").addEventListener("input",e=>{const i=e.target.dataset.c;if(i==null)return;const c=cats()[i],v=e.target.value.trim();
+  v?ov.categories[c]=v:delete ov.categories[c];$("#bar").classList.toggle("on",dirty());});
+$("#role").addEventListener("input",e=>{ov.settings.role=e.target.value;$("#bar").classList.toggle("on",dirty())});
+$("#cv").addEventListener("input",e=>{ov.settings.cvUrl=e.target.value.trim();$("#bar").classList.toggle("on",dirty())});
+$("#rev").onclick=()=>{ov=norm(JSON.parse(base));render()};
+
+$("#save").onclick=async()=>{
+  const btn=$("#save");btn.disabled=true;
+  try{
+    const g=await api(`/contents/${FILE}?ref=${branch}`);const sha=g.ok?(await g.json()).sha:undefined;
+    const body={message:"Update gallery settings from dashboard",content:b64(JSON.stringify(ov,null,2)+"\n"),branch,...(sha?{sha}:{})};
+    const r=await api(`/contents/${FILE}`,{method:"PUT",body:JSON.stringify(body)});
+    if(!r.ok)throw new Error(r.status);
+    base=JSON.stringify(ov);render();toast("تم الحفظ. يظهر للزائر خلال دقيقة أو دقيقتين بعد النشر.");setTimeout(runs,6000);
+  }catch(e){toast("فشل الحفظ ("+e.message+"). تحقق من صلاحيات الرمز.",true)}
+  btn.disabled=false;
+};
+$("#sync").onclick=async()=>{
+  const b=$("#sync");b.disabled=true;
+  const r=await api(`/actions/workflows/${WF}/dispatches`,{method:"POST",body:JSON.stringify({ref:branch})}).catch(()=>null);
+  r&&r.status===204?(toast("بدأ التحديث من الدرايف. ستظهر الفيديوهات الجديدة خلال دقائق."),setTimeout(runs,6000)):toast("تعذّر بدء التحديث. تحقق من صلاحية Actions.",true);
+  b.disabled=false;
+};
+$("#out").onclick=()=>{store.set("");location.reload()};
+$("#go").onclick=login;
+$("#tok").addEventListener("keydown",e=>{if(e.key==="Enter")login()});
+addEventListener("beforeunload",e=>{if(!$("#app").hidden&&dirty()){e.preventDefault();e.returnValue=""}});
+token=store.get();if(token){$("#tok").value=token;login()}
+})();
+</script>
+</body>
+</html>

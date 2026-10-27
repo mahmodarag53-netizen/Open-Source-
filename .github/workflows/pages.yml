@@ -4,7 +4,7 @@ on:
     branches: [main]
   workflow_dispatch:
   schedule:
-    - cron: "17 3 * * 1"   # مزامنة أسبوعية لقائمة الفيديوهات من الدرايف
+    - cron: "*/30 * * * *"   # مزامنة قائمة الفيديوهات من الدرايف كل 30 دقيقة
 permissions:
   contents: write
   pages: write
@@ -26,7 +26,7 @@ jobs:
         with:
           enablement: true
       - name: Stage site
-        run: mkdir _site && cp index.html works.json robots.txt .nojekyll _site/
+        run: mkdir _site && cp index.html admin.html works.json overrides.json robots.txt .nojekyll _site/
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site
