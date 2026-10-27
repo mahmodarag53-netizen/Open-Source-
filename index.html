@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>محمود أعرج — معرض الأعمال</title>
+<title>Mahmoud Araj — معرض الأعمال</title>
 <meta name="description" content="معرض أعمال محمود أعرج: إخراج بصري، تصوير، مونتاج وتصحيح ألوان.">
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
 <meta name="googlebot" content="noindex, nofollow">
@@ -43,10 +43,11 @@ header{display:flex;justify-content:flex-start;align-items:center;gap:12px;flex-
 
 /* مقدمة: الاسم يُرسم على الكانفاس، والـ h1 للقراءة الآلية فقط */
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-.intro{min-height:74svh;display:flex;align-items:flex-end;justify-content:center;text-align:center;padding:0 var(--pad) clamp(32px,7vh,72px)}
+.intro{min-height:74svh;display:flex;align-items:flex-start;justify-content:center;text-align:center;padding:0 var(--pad) clamp(32px,7vh,72px)}
 .sub{opacity:0;transform:translateY(18px);transition:opacity 1.6s var(--ease),transform 1.6s var(--ease)}
 .sub.on{opacity:1;transform:none}
-.sub p{font-size:clamp(1.2rem,3vw,2rem);color:var(--gold);font-weight:300}
+.sub .role{font-size:clamp(1.3rem,3.2vw,2.2rem);color:var(--gold);font-weight:600;letter-spacing:.08em;line-height:1.4}
+.sub .gal{font-size:clamp(.95rem,1.8vw,1.15rem);color:var(--mute);font-weight:300}
 .sub .pill{display:inline-block;margin-top:14px;padding:8px 22px;font-size:.95rem}
 
 /* filter */
@@ -133,9 +134,10 @@ footer p{color:var(--mute);font-size:.8rem;margin-top:48px}
 </header>
 
 <section class="intro" id="top">
-  <h1 class="sr">محمود أعرج</h1>
+  <h1 class="sr">Mahmoud Araj</h1>
   <div class="sub" id="sub">
-    <p>معرض الأعمال</p>
+    <p class="role" dir="ltr">Senior Editor</p>
+    <p class="gal">معرض الأعمال</p>
     <a class="pill cv" href="https://drive.google.com/file/d/194y-hcqcrfn_JpsfyU2jkBr3UbCX6mK3/view?usp=drive_link" target="_blank" rel="noopener noreferrer">نبذة عني</a>
   </div>
 </section>
@@ -185,7 +187,7 @@ let works=[],view=[],cur=-1,lastFocus=null;
 
 /* ---------- كشف بطيء: شظايا تتجمع لتكوّن الاسم ثم يتكشف، وتتحول لغبار خلف الصفحة ---------- */
 (async()=>{
-  const c=$("#fx"),x=c.getContext("2d"),NAME="محمود أعرج",GOLD="232,184,102",INK="242,239,233";
+  const c=$("#fx"),x=c.getContext("2d"),NAME="Mahmoud Araj",GOLD="232,184,102",INK="242,239,233";
   const ease=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;         // easeInOutCubic
   const clamp=(v,a=0,b=1)=>Math.min(b,Math.max(a,v));
   const rnd=(a,b)=>a+Math.random()*(b-a);
@@ -196,18 +198,19 @@ let works=[],view=[],cur=-1,lastFocus=null;
 
   function layout(){
     D=Math.min(devicePixelRatio||1,1.5);W=c.width=Math.round(innerWidth*D);H=c.height=Math.round(innerHeight*D);
-    fs=Math.min(W*.15,H*.27,230*D);cx=W/2;cy=H*.36;
+    fs=Math.min(W*.12,H*.27,210*D);cx=W/2;cy=H*.36;
     const o=document.createElement("canvas");o.width=W;o.height=Math.ceil(fs*1.7);
     const g=o.getContext("2d",{willReadFrequently:true});
-    g.font=`800 ${fs}px Cairo, sans-serif`;g.direction="rtl";g.textAlign="center";g.textBaseline="middle";g.fillStyle="#fff";g.fillText(NAME,W/2,o.height/2);
+    g.font=`800 ${fs}px Cairo, sans-serif`;g.direction="ltr";g.textAlign="center";g.textBaseline="middle";g.fillStyle="#fff";g.fillText(NAME,W/2,o.height/2);
     const d=g.getImageData(0,0,o.width,o.height).data;
     let step=Math.max(2,Math.round(fs/50)),all;
     for(;;){all=[];for(let yy=0;yy<o.height;yy+=step)for(let xx=0;xx<o.width;xx+=step)if(d[(yy*o.width+xx)*4+3]>128)all.push([xx,yy-o.height/2+cy]);
       if(all.length<=6000)break;step++}
+    $("#sub").parentElement.style.paddingTop=Math.round((cy+fs*.6)/D)+"px";
     minX=Math.min(...all.map(p=>p[0]));maxX=Math.max(...all.map(p=>p[0]));
     const far=Math.max(W,H);
     pts=all.map(([tx,ty])=>{const a=rnd(0,6.283),r=rnd(.25,.85)*far;
-      return{tx,ty,sx:cx+Math.cos(a)*r,sy:cy+Math.sin(a)*r*.7,dl:rnd(0,2.4)+(1-tx/W)*.8,du:rnd(2.6,3.8),ph:rnd(0,6.283),sz:rnd(1.1,2)*D}});
+      return{tx,ty,sx:cx+Math.cos(a)*r,sy:cy+Math.sin(a)*r*.7,dl:rnd(0,2.4)+(tx/W)*.8,du:rnd(2.6,3.8),ph:rnd(0,6.283),sz:rnd(1.1,2)*D}});
     dust=Array.from({length:Math.round(90*(W*H)/(1280*800))},()=>({x:rnd(0,W),y:rnd(0,H),r:rnd(.6,1.6)*D,sp:rnd(.4,1),ph:rnd(0,6.283)}));
   }
   layout();addEventListener("resize",layout);
@@ -238,18 +241,18 @@ let works=[],view=[],cur=-1,lastFocus=null;
       // كشف الاسم من اليمين إلى اليسار
       const rp=clamp((t-R0)/RD);
       if(rp>0){
-        const e=ease(rp),edge=maxX+30*D-(maxX-minX+60*D)*e;
-        x.globalCompositeOperation="source-over";x.save();x.beginPath();x.rect(edge,0,W-edge,H);x.clip();
-        x.font=`800 ${fs}px Cairo, sans-serif`;x.direction="rtl";x.textAlign="center";x.textBaseline="middle";
+        const e=ease(rp),edge=minX-30*D+(maxX-minX+60*D)*e;
+        x.globalCompositeOperation="source-over";x.save();x.beginPath();x.rect(0,0,edge,H);x.clip();
+        x.font=`800 ${fs}px Cairo, sans-serif`;x.direction="ltr";x.textAlign="center";x.textBaseline="middle";
         x.fillStyle=`rgba(${INK},${k})`;x.fillText(NAME,cx,cy);x.restore();
-        if(rp<1){const g=x.createLinearGradient(edge-60*D,0,edge+6*D,0);
+        if(rp<1){const g=x.createLinearGradient(edge+60*D,0,edge-6*D,0);
           g.addColorStop(0,`rgba(${GOLD},0)`);g.addColorStop(1,`rgba(${GOLD},${.9*k})`);
-          x.globalCompositeOperation="lighter";x.fillStyle=g;x.fillRect(edge-60*D,cy-fs*.7,66*D,fs*1.4)}
+          x.globalCompositeOperation="lighter";x.fillStyle=g;x.fillRect(edge-6*D,cy-fs*.7,66*D,fs*1.4)}
         // لمعة دورية بعد اكتمال الكشف
         else{const ph=((t-R0-RD)%12)/12;
-          if(ph<.22){const s=ease(ph/.22),bx=maxX+60*D-(maxX-minX+120*D)*s;
+          if(ph<.22){const s=ease(ph/.22),bx=minX-60*D+(maxX-minX+120*D)*s;
             x.globalCompositeOperation="source-over";x.save();x.beginPath();x.rect(bx-50*D,0,100*D,H);x.clip();
-            x.font=`800 ${fs}px Cairo, sans-serif`;x.direction="rtl";x.textAlign="center";x.textBaseline="middle";
+            x.font=`800 ${fs}px Cairo, sans-serif`;x.direction="ltr";x.textAlign="center";x.textBaseline="middle";
             x.fillStyle=`rgba(${GOLD},${.85*k})`;x.fillText(NAME,cx,cy);x.restore()}}
       }
       x.restore();
