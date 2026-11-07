@@ -8,6 +8,7 @@ const RAR = "U+0600-06FF, U+0750-077F, U+0870-0891, U+0897-08E1, U+08E3-08FF, U+
 const RLA = "U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD";
 export const FONT_TITLE = "Naskh";
 export const FONT_UI = "Readex";
+export const FONT_HEAVY = "CairoX";
 for (const [family, file, weight, unicodeRange] of [
   [FONT_TITLE, "naskh-700-arabic", "700", AR],
   [FONT_TITLE, "naskh-700-latin", "700", LA],
@@ -15,6 +16,8 @@ for (const [family, file, weight, unicodeRange] of [
   [FONT_UI, "readex-400-latin", "400", RLA],
   [FONT_UI, "readex-600-arabic", "600", RAR],
   [FONT_UI, "readex-600-latin", "600", RLA],
+  [FONT_HEAVY, "cairo-800-arabic", "800", AR],
+  [FONT_HEAVY, "cairo-800-latin", "800", LA],
 ] as const) {
   loadFont({ family, url: staticFile(`fonts/${file}.woff2`), weight, unicodeRange, format: "woff2" });
 }
@@ -22,34 +25,44 @@ for (const [family, file, weight, unicodeRange] of [
 export type Palette = {
   paper: string; grid: string; ink: string; inkSoft: string; orange: string; orangeSoft: string;
   olive: string; oliveSoft: string; sand: string; blue: string; blueSoft: string; white: string;
-  shadow: string; vignette: string; dim: string;
+  shadow: string; vignette: string; dim: string; title: string; glow: string; glow2: string;
 };
 
 // "orange" / "olive" / "blue" are role names (accent / positive / info) kept for the components.
 export const PALETTES: Record<string, Palette> = {
+  // ★ Mahmoud's approved identity — night navy, glass, cyan + lime neon, gold-cream titles
+  night: {
+    paper: "#08111F", grid: "#1A3150", ink: "#E4EEF9", inkSoft: "#7D90AA", orange: "#E3EC5C", orangeSoft: "#5E6626",
+    olive: "#3FD3F0", oliveSoft: "#123D50", sand: "#10203A", blue: "#3FD3F0", blueSoft: "#163A52", white: "#0F1B2E",
+    shadow: "rgba(0,0,0,0.65)", vignette: "rgba(2,6,14,0.75)", dim: "rgba(228,238,249,0.38)",
+    title: "#EEDDA6", glow: "rgba(63,211,240,0.55)", glow2: "rgba(227,236,92,0.5)",
+  },
   // A — graphite chalkboard, acid-lime signal, lilac second voice
   graphite: {
     paper: "#1A1C20", grid: "#2E3138", ink: "#EEEADF", inkSoft: "#9B978D", orange: "#C9F25E", orangeSoft: "#6F8C36",
     olive: "#8F7CFF", oliveSoft: "#4B4380", sand: "#2A2D33", blue: "#4CC9B8", blueSoft: "#2A5A55", white: "#23262B",
     shadow: "rgba(0,0,0,0.55)", vignette: "rgba(0,0,0,0.55)", dim: "rgba(238,234,223,0.35)",
+    title: "", glow: "transparent", glow2: "transparent",
   },
   // B — cool stone paper, deep-green ink, cobalt signal
   stone: {
     paper: "#E6ECE8", grid: "#CFDAD4", ink: "#14302A", inkSoft: "#587069", orange: "#2E5BFF", orangeSoft: "#A9BCFF",
     olive: "#1E8C6E", oliveSoft: "#A5DCC7", sand: "#D3DED8", blue: "#D9A520", blueSoft: "#F1DC9C", white: "#F6F9F7",
     shadow: "rgba(20,48,42,0.22)", vignette: "rgba(20,48,42,0.18)", dim: "rgba(20,48,42,0.32)",
+    title: "", glow: "transparent", glow2: "transparent",
   },
   // C — midnight navy, signal yellow, mint
   midnight: {
     paper: "#0F2436", grid: "#1C3448", ink: "#F1EEE5", inkSoft: "#93A3B1", orange: "#FFD43B", orangeSoft: "#8A7424",
     olive: "#62D9B5", oliveSoft: "#2A5E57", sand: "#183044", blue: "#F59AC0", blueSoft: "#6A3E57", white: "#152C40",
     shadow: "rgba(0,0,0,0.5)", vignette: "rgba(0,8,16,0.6)", dim: "rgba(241,238,229,0.35)",
+    title: "", glow: "transparent", glow2: "transparent",
   },
 };
 
 // Mutable live palette: Episode calls setPalette() before rendering children.
-export const C: Palette = { ...PALETTES.graphite };
-export const setPalette = (name: string) => Object.assign(C, PALETTES[name] ?? PALETTES.graphite);
+export const C: Palette = { ...PALETTES.night };
+export const setPalette = (name: string) => Object.assign(C, PALETTES[name] ?? PALETTES.night);
 
 export const BRAND = {
   series: "طيب شلون؟",

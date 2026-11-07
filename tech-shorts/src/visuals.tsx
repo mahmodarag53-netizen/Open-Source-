@@ -1,7 +1,7 @@
 import React from "react";
 import { interpolate, useCurrentFrame } from "remotion";
 import { Icon } from "./icons";
-import { C, EASE_BACK, EASE_IN_OUT, EASE_OUT, FONT_TITLE, FONT_UI } from "./theme";
+import { C, EASE_BACK, EASE_IN_OUT, EASE_OUT, FONT_HEAVY, FONT_UI } from "./theme";
 
 export type Visual = {
   type: "hero" | "desk" | "compare" | "flow" | "bars" | "steps" | "bigtext";
@@ -28,10 +28,27 @@ export type Visual = {
 const ease = (f: number, a: number, b: number, e = EASE_OUT) =>
   interpolate(f, [a, b], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: e });
 
+const glass = (accent: string, strong = false): React.CSSProperties => ({
+  background: "linear-gradient(160deg, rgba(34,58,92,0.72), rgba(10,20,36,0.88))",
+  border: `2px solid ${accent}`,
+  boxShadow: `0 0 ${strong ? 40 : 22}px ${accent === C.orange ? C.glow2 : C.glow}, inset 0 0 26px rgba(63,211,240,0.10)`,
+});
+
+/** Isometric glowing pedestal — real CSS 3D plane under hero objects. */
+const Platform: React.FC<{ w: number; f: number; o: number }> = ({ w, f, o }) => (
+  <div style={{ position: "absolute", left: "50%", bottom: -w * 0.08, width: w, height: w, marginLeft: -w / 2, transform: `rotateX(64deg) rotateZ(45deg) scale(${0.8 + 0.2 * o})`, opacity: o, pointerEvents: "none" }}>
+    <div style={{ position: "absolute", inset: 0, borderRadius: 40, background: "linear-gradient(135deg, #16294A, #0B1628)", border: `3px solid ${C.olive}`, boxShadow: `0 0 50px ${C.glow}, inset 0 0 40px rgba(63,211,240,0.25)` }} />
+    <div style={{ position: "absolute", inset: w * 0.12, borderRadius: 30, border: `3px solid ${C.orange}`, opacity: 0.55 + 0.45 * Math.sin(f / 9), boxShadow: `0 0 26px ${C.glow2}` }} />
+    {Array.from({ length: 4 }).map((_, i) => (
+      <div key={i} style={{ position: "absolute", left: 0, right: 0, top: `${20 + i * 20}%`, height: 2, background: C.olive, opacity: 0.25 }} />
+    ))}
+  </div>
+);
+
 const Chip: React.FC<{ text: string; color?: string; size?: number; o?: number }> = ({ text, color = C.ink, size = 46, o = 1 }) => (
   <div
     style={{
-      fontFamily: FONT_UI, fontWeight: 600, fontSize: size, color: C.paper, background: color,
+      fontFamily: FONT_UI, fontWeight: 600, fontSize: size, color: color === C.ink ? C.ink : color, ...glass(color === C.ink ? C.olive : color),
       padding: "10px 34px 14px", borderRadius: 999, opacity: o, transform: `translateY(${(1 - o) * 30}px)`,
       whiteSpace: "nowrap", direction: "rtl",
     }}
@@ -47,8 +64,11 @@ const Hero: React.FC<{ v: Visual }> = ({ v }) => {
   const float = Math.sin(f / 22) * 10;
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 30 }}>
-      <div style={{ transform: `translateY(${float}px) scale(${pop})` }}>
-        <Icon name={v.icon!} size={780} d={d} f={f} state={v.state} />
+      <div style={{ position: "relative", transformStyle: "preserve-3d" }}>
+        <Platform w={560} f={f} o={ease(f, 0, 26, EASE_OUT)} />
+        <div style={{ transform: `translateY(${float - 40}px) scale(${pop})` }}>
+          <Icon name={v.icon!} size={720} d={d} f={f} state={v.state} />
+        </div>
       </div>
       {v.label && <Chip text={v.label} o={ease(f, 18, 34)} />}
     </div>
@@ -118,7 +138,7 @@ const Compare: React.FC<{ v: Visual }> = ({ v }) => {
       <div
         style={{
           position: "absolute", left: "50%", top: "40%", transform: `translate(-50%,-50%) scale(${ease(f, 18, 32, EASE_BACK)})`,
-          fontFamily: FONT_TITLE, fontSize: 70, color: C.orange,
+          fontFamily: FONT_HEAVY, fontSize: 70, color: C.orange,
         }}
       >
         {v.winner ? "" : "×"}
@@ -181,7 +201,7 @@ const Bars: React.FC<{ v: Visual }> = ({ v }) => {
         return (
           <div key={i} style={{ display: "flex", alignItems: "center", gap: 26, opacity: ease(f, i * 10, 14 + i * 10) }}>
             <div style={{ width: 210, fontFamily: FONT_UI, fontWeight: 600, fontSize: 44, color: C.ink, textAlign: "right" }}>{it.label}</div>
-            <div style={{ height: 96, width: w, background: i === items.length - 1 ? C.orange : C.blue, border: `6px solid ${C.ink}`, borderRadius: 14 }} />
+            <div style={{ height: 96, width: w, background: `linear-gradient(90deg, ${i === items.length - 1 ? C.orange : C.olive}, ${i === items.length - 1 ? "#9AA62C" : "#1E7E94"})`, borderRadius: 16, boxShadow: `0 0 26px ${i === items.length - 1 ? C.glow2 : C.glow}`, border: "2px solid rgba(255,255,255,0.35)" }} />
             <div style={{ fontFamily: FONT_UI, fontWeight: 600, fontSize: 50, color: C.ink, direction: "ltr" }}>{shown.toFixed(dec)}</div>
           </div>
         );
@@ -206,16 +226,21 @@ const Steps: React.FC<{ v: Visual }> = ({ v }) => {
           <div
             key={i}
             style={{
-              display: "flex", alignItems: "center", gap: 30, background: C.white, border: `6px solid ${C.ink}`, borderRadius: 26,
-              padding: "26px 34px", opacity: o, transform: `translateX(${(1 - o) * -160}px) rotate(${(1 - o) * -3}deg)`,
-              boxShadow: `10px 10px 0 ${i === items.length - 1 ? C.orange : C.oliveSoft}`,
+              position: "relative", display: "flex", alignItems: "center", gap: 30, ...glass(chk > 0.5 ? C.olive : "rgba(125,144,170,0.6)"), borderRadius: 28,
+              padding: "44px 34px 30px", opacity: o, transform: `perspective(1200px) rotateY(${(1 - o) * -35}deg) translateX(${(1 - o) * -160}px)`,
             }}
           >
-            <svg width={84} height={84} viewBox="0 0 84 84">
-              <circle cx={42} cy={42} r={36} fill={chk > 0.5 ? C.olive : C.sand} stroke={C.ink} strokeWidth={5} />
-              <path d="M24 44 L37 57 L61 30" stroke={C.white} strokeWidth={8} fill="none" strokeLinecap="round" strokeLinejoin="round" pathLength={1} strokeDasharray={1} strokeDashoffset={1 - chk} />
+            <div style={{ position: "absolute", top: 14, left: 26, display: "flex", gap: 10 }}>
+              {[0, 1, 2].map((k) => <div key={k} style={{ width: 12, height: 12, borderRadius: "50%", background: C.inkSoft, opacity: 0.7 }} />)}
+            </div>
+            <svg width={84} height={84} viewBox="0 0 84 84" style={{ filter: `drop-shadow(0 0 12px ${C.glow})` }}>
+              <circle cx={42} cy={42} r={36} fill={chk > 0.5 ? C.olive : C.sand} stroke={C.olive} strokeWidth={3} />
+              <path d="M24 44 L37 57 L61 30" stroke={C.paper} strokeWidth={8} fill="none" strokeLinecap="round" strokeLinejoin="round" pathLength={1} strokeDasharray={1} strokeDashoffset={1 - chk} />
             </svg>
-            <div style={{ fontFamily: FONT_UI, fontWeight: 600, fontSize: 54, color: C.ink }}>{t}</div>
+            <div style={{ fontFamily: FONT_UI, fontWeight: 600, fontSize: 52, color: C.ink }}>
+              <span style={{ color: C.olive, marginLeft: 14 }}>{i + 1}.</span>
+              {t}
+            </div>
           </div>
         );
       })}
@@ -230,9 +255,9 @@ const BigText: React.FC<{ v: Visual }> = ({ v }) => {
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 36 }}>
       <div
         style={{
-          fontFamily: FONT_TITLE, fontSize: (v.text?.length ?? 0) > 10 ? 120 : 170, color: C.ink, direction: "rtl",
+          fontFamily: FONT_HEAVY, fontWeight: 800, fontSize: (v.text?.length ?? 0) > 10 ? 116 : 160, color: C.title, direction: "rtl", textShadow: `0 0 28px ${C.glow2}`,
           transform: `scale(${interpolate(o, [0, 1], [0.5, 1])}) rotate(${(1 - o) * -6}deg)`, opacity: Math.min(1, o * 1.5),
-          background: C.white, border: `8px solid ${C.ink}`, borderRadius: 30, padding: "20px 60px 40px", boxShadow: `16px 16px 0 ${C.orange}`,
+          ...glass(C.olive, true), borderRadius: 36, padding: "20px 60px 40px",
           whiteSpace: "nowrap",
         }}
       >
