@@ -1,10 +1,16 @@
 import React from "react";
-import { interpolate, useCurrentFrame } from "remotion";
+import { Img, interpolate, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
 import { Icon } from "./icons";
 import { C, EASE_BACK, EASE_IN_OUT, EASE_OUT, FONT_HEAVY, FONT_UI } from "./theme";
 
 export type Visual = {
-  type: "hero" | "desk" | "compare" | "flow" | "bars" | "steps" | "bigtext";
+  type: "hero" | "desk" | "compare" | "flow" | "bars" | "steps" | "bigtext" | "asset";
+  asset?: string;
+  focus?: [number, number];
+  zoom?: [number, number];
+  tags?: { text: string; x: number; y: number; accent?: boolean }[];
+  packets?: { from: [number, number]; to: [number, number]; lift?: number };
+  shake?: boolean;
   icon?: string;
   state?: string;
   label?: string;
@@ -268,6 +274,55 @@ const BigText: React.FC<{ v: Visual }> = ({ v }) => {
   );
 };
 
+/**
+ * 3D asset scene: a generated isometric render placed in depth.
+ * Far layer = blurred, enlarged copy (depth of field); near layer = sharp render with a slow camera push
+ * toward `focus` (0–1 image coords). Code-driven neon packets and tags sit on top in the same camera space.
+ */
+const AssetScene: React.FC<{ v: Visual }> = ({ v }) => {
+  const f = useCurrentFrame();
+  const { durationInFrames } = useVideoConfig();
+  const W = 1420;
+  const H = Math.round(W * (768 / 1376));
+  const [fx, fy] = v.focus ?? [0.5, 0.5];
+  const [z0, z1] = v.zoom ?? [1.0, 1.12];
+  const push = interpolate(f, [0, durationInFrames], [z0, z1], { easing: EASE_IN_OUT, extrapolateRight: "clamp" });
+  const shake = v.shake ? Math.sin(f * 1.9) * 3 * ease(f, 10, 30) : 0;
+  const mask = "radial-gradient(ellipse 50% 50% at 50% 50%, black 62%, transparent 100%)";
+  const P = v.packets;
+  return (
+    <div style={{ position: "relative", width: W, height: H, transform: `translateX(${shake}px)` }}>
+      <Img
+        src={staticFile(v.asset!)}
+        style={{ position: "absolute", inset: 0, width: W, height: H, transform: `scale(${push * 1.25})`, transformOrigin: `${fx * 100}% ${fy * 100}%`, filter: "blur(28px) brightness(0.7)", opacity: 0.55, maskImage: mask, WebkitMaskImage: mask }}
+      />
+      <div style={{ position: "absolute", inset: 0, transform: `scale(${push})`, transformOrigin: `${fx * 100}% ${fy * 100}%` }}>
+        <Img src={staticFile(v.asset!)} style={{ width: W, height: H, maskImage: mask, WebkitMaskImage: mask, mixBlendMode: "lighten" }} />
+        {P && (
+          <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} style={{ position: "absolute", inset: 0, overflow: "visible" }}>
+            {Array.from({ length: 6 }).map((_, i) => {
+              const t = ((f / 40 + i / 6) % 1);
+              const ax = P.from[0] * W, ay = P.from[1] * H, bx = P.to[0] * W, by = P.to[1] * H;
+              const mx = (ax + bx) / 2, my = Math.min(ay, by) - (P.lift ?? 0.15) * H;
+              const x = (1 - t) * (1 - t) * ax + 2 * (1 - t) * t * mx + t * t * bx;
+              const y = (1 - t) * (1 - t) * ay + 2 * (1 - t) * t * my + t * t * by;
+              return <rect key={i} x={x - 14} y={y - 9} width={28} height={18} rx={4} fill={i % 2 ? C.orange : C.olive} opacity={Math.sin(t * Math.PI) * ease(f, 12, 24)} style={{ filter: `drop-shadow(0 0 10px ${i % 2 ? C.glow2 : C.glow})` }} />;
+            })}
+          </svg>
+        )}
+      </div>
+      {(v.tags ?? []).map((t, i) => {
+        const o = ease(f, 14 + i * 8, 30 + i * 8, EASE_BACK);
+        return (
+          <div key={i} style={{ position: "absolute", left: t.x * W, top: t.y * H, transform: `translate(-50%,-50%) scale(${0.6 + 0.4 * o})`, opacity: o }}>
+            <Chip text={t.text} color={t.accent ? C.orange : C.ink} size={44} o={1} />
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
 export const VisualView: React.FC<{ v: Visual }> = ({ v }) => {
   switch (v.type) {
     case "hero": return <Hero v={v} />;
@@ -277,5 +332,6 @@ export const VisualView: React.FC<{ v: Visual }> = ({ v }) => {
     case "bars": return <Bars v={v} />;
     case "steps": return <Steps v={v} />;
     case "bigtext": return <BigText v={v} />;
+    case "asset": return <AssetScene v={v} />;
   }
 };
