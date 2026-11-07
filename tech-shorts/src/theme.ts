@@ -19,19 +19,42 @@ for (const [family, file, weight, unicodeRange] of [
   loadFont({ family, url: staticFile(`fonts/${file}.woff2`), weight, unicodeRange, format: "woff2" });
 }
 
-export const C = {
-  paper: "#F3ECDF",
-  grid: "#E3D8C4",
-  ink: "#2B2622",
-  inkSoft: "#6B6158",
-  orange: "#C8502D",
-  orangeSoft: "#E89B7B",
-  olive: "#7E8C4A",
-  oliveSoft: "#B8C18E",
-  sand: "#E6D9BF",
-  blue: "#3D6E8C",
-  blueSoft: "#9DBBCB",
-  white: "#FBF8F2",
+export type Palette = {
+  paper: string; grid: string; ink: string; inkSoft: string; orange: string; orangeSoft: string;
+  olive: string; oliveSoft: string; sand: string; blue: string; blueSoft: string; white: string;
+  shadow: string; vignette: string; dim: string;
+};
+
+// "orange" / "olive" / "blue" are role names (accent / positive / info) kept for the components.
+export const PALETTES: Record<string, Palette> = {
+  // A — graphite chalkboard, acid-lime signal, lilac second voice
+  graphite: {
+    paper: "#1A1C20", grid: "#2E3138", ink: "#EEEADF", inkSoft: "#9B978D", orange: "#C9F25E", orangeSoft: "#6F8C36",
+    olive: "#8F7CFF", oliveSoft: "#4B4380", sand: "#2A2D33", blue: "#4CC9B8", blueSoft: "#2A5A55", white: "#23262B",
+    shadow: "rgba(0,0,0,0.55)", vignette: "rgba(0,0,0,0.55)", dim: "rgba(238,234,223,0.35)",
+  },
+  // B — cool stone paper, deep-green ink, cobalt signal
+  stone: {
+    paper: "#E6ECE8", grid: "#CFDAD4", ink: "#14302A", inkSoft: "#587069", orange: "#2E5BFF", orangeSoft: "#A9BCFF",
+    olive: "#1E8C6E", oliveSoft: "#A5DCC7", sand: "#D3DED8", blue: "#D9A520", blueSoft: "#F1DC9C", white: "#F6F9F7",
+    shadow: "rgba(20,48,42,0.22)", vignette: "rgba(20,48,42,0.18)", dim: "rgba(20,48,42,0.32)",
+  },
+  // C — midnight navy, signal yellow, mint
+  midnight: {
+    paper: "#0F2436", grid: "#1C3448", ink: "#F1EEE5", inkSoft: "#93A3B1", orange: "#FFD43B", orangeSoft: "#8A7424",
+    olive: "#62D9B5", oliveSoft: "#2A5E57", sand: "#183044", blue: "#F59AC0", blueSoft: "#6A3E57", white: "#152C40",
+    shadow: "rgba(0,0,0,0.5)", vignette: "rgba(0,8,16,0.6)", dim: "rgba(241,238,229,0.35)",
+  },
+};
+
+// Mutable live palette: Episode calls setPalette() before rendering children.
+export const C: Palette = { ...PALETTES.graphite };
+export const setPalette = (name: string) => Object.assign(C, PALETTES[name] ?? PALETTES.graphite);
+
+export const BRAND = {
+  series: "طيب شلون؟",
+  author: "محمود أعرج",
+  authorLatin: "Mahmoud Arag",
 };
 
 export const W = 1080;

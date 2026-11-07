@@ -70,6 +70,7 @@ export const RemotionRoot: React.FC = () => (
           scenes: [],
           outroFrom: 0,
           motionBlur: true,
+          palette: "graphite",
         }}
       />
     ))}

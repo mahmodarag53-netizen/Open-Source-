@@ -55,16 +55,16 @@ const Hero: React.FC<{ v: Visual }> = ({ v }) => {
   );
 };
 
-const TOOL_COLORS = [C.orange, C.blue, C.olive, C.ink, C.orangeSoft, C.blueSoft, C.oliveSoft, C.sand];
 
 const Desk: React.FC<{ v: Visual }> = ({ v }) => {
   const f = useCurrentFrame();
+  const TOOL_COLORS = [C.orange, C.blue, C.olive, C.ink, C.orangeSoft, C.blueSoft, C.oliveSoft, C.sand];
   const d = ease(f, 0, 24, EASE_IN_OUT);
   const n = Math.round(4 + (v.fill ?? 0.5) * 10);
   const shake = v.overflow ? Math.sin(f * 1.7) * 4 * ease(f, 40, 55) : 0;
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 20 }}>
-      <svg width={940} height={790} viewBox="0 0 400 340" style={{ overflow: "visible", transform: `translateX(${shake}px)` }}>
+      <svg width={860} height={600} viewBox="0 40 400 280" style={{ overflow: "visible", transform: `translateX(${shake}px)` }}>
         <g transform="translate(0 -40)">
           <Icon name="desk" size={400} d={d} f={f} />
         </g>
