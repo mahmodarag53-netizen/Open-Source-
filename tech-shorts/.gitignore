@@ -8,3 +8,4 @@ out
 
 # raw VO masters (mp3 copies are committed)
 public/vo/**/*.wav
+public/vo/**/*.wav.*
