@@ -34,7 +34,14 @@ def norm(t):
     t = re.sub(r"[\u064B-\u0652\u0640]", "", t)  # tashkeel + tatweel
     t = re.sub("[إأآا]", "ا", t).replace("ة", "ه").replace("ى", "ي").replace("ؤ", "و").replace("ئ", "ي")
     t = re.sub(r"[^\w\s]", " ", t)
-    return t.split()
+    # Whisper writes Syrian dialect in MSA spelling — fold the common variants together.
+    t = t.translate(str.maketrans("ثذظق", "تدضء"))
+    out = []
+    for w in t.split():
+        w = re.sub(r"ه$", "و", w)          # لحاله → لحالو
+        w = {"مثل": "متل", "هذا": "هاد", "علي": "ع", "عل": "ع"}.get(w, w)
+        out.append(w)
+    return out
 
 
 def transcribe(path):
