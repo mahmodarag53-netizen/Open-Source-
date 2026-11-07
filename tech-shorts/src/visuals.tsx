@@ -261,7 +261,7 @@ const BigText: React.FC<{ v: Visual }> = ({ v }) => {
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 36 }}>
       <div
         style={{
-          fontFamily: FONT_HEAVY, fontWeight: 800, fontSize: (v.text?.length ?? 0) > 10 ? 116 : 160, color: C.title, direction: "rtl", textShadow: `0 0 28px ${C.glow2}`,
+          fontFamily: FONT_HEAVY, fontWeight: 800, fontSize: (v.text?.length ?? 0) > 10 ? 116 : 160, color: C.title, direction: /[\u0621-\u064A]/.test(v.text ?? "") ? "rtl" : "ltr", textShadow: `0 0 28px ${C.glow2}`,
           transform: `scale(${interpolate(o, [0, 1], [0.5, 1])}) rotate(${(1 - o) * -6}deg)`, opacity: Math.min(1, o * 1.5),
           ...glass(C.olive, true), borderRadius: 36, padding: "20px 60px 40px",
           whiteSpace: "nowrap",
