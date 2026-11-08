@@ -54,12 +54,12 @@ const Paper: React.FC = () => {
         const s = 3 + (i % 4) * 2;
         return <div key={i} style={{ position: "absolute", left: x, top: y, width: s, height: s, borderRadius: "50%", background: i % 3 ? C.olive : C.orange, opacity: 0.25 + (i % 4) * 0.12, filter: `blur(${(i % 4) * 1.2}px)` }} />;
       })}
-      <svg width="100%" height="100%" style={{ position: "absolute", inset: 0, opacity: 0.07, mixBlendMode: "overlay" }}>
-        <filter id="grain">
-          <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves={2} seed={f % 8} />
-        </filter>
-        <rect width="100%" height="100%" filter="url(#grain)" />
-      </svg>
+      <AbsoluteFill
+        style={{
+          backgroundImage: `url(${staticFile("fx/grain.png")})`, backgroundSize: "512px 512px",
+          backgroundPosition: `${(f * 137) % 512}px ${(f * 251) % 512}px`, opacity: 0.07, mixBlendMode: "overlay",
+        }}
+      />
       <AbsoluteFill style={{ background: `radial-gradient(ellipse at 50% 45%, transparent 45%, ${C.vignette} 100%)` }} />
     </AbsoluteFill>
   );
@@ -70,8 +70,8 @@ const NearPlane: React.FC = () => {
   const f = useCurrentFrame();
   const o = ease(f, 6, 30);
   const p = (k: number) => Math.sin(f / k);
-  const bokeh = (left: number, top: number, size: number, color: string, blur: number, alpha: number) => (
-    <div style={{ position: "absolute", left, top, width: size, height: size, borderRadius: "50%", background: `radial-gradient(circle, ${color} 0%, transparent 70%)`, opacity: alpha * o, filter: `blur(${blur}px)` }} />
+  const bokeh = (left: number, top: number, size: number, color: string, _blur: number, alpha: number) => (
+    <div style={{ position: "absolute", left, top, width: size, height: size, borderRadius: "50%", background: `radial-gradient(circle, ${color} 0%, transparent 70%)`, opacity: alpha * o }} />
   );
   return (
     <AbsoluteFill style={{ pointerEvents: "none", mixBlendMode: "screen" }}>
@@ -169,7 +169,7 @@ const Title: React.FC<{ p: EpisodeProps }> = ({ p }) => {
 };
 
 /* ---------- scene camera: rack focus in, slow push, defocus out ---------- */
-const SceneCam: React.FC<{ frames: number; children: React.ReactNode }> = ({ frames, children }) => {
+const SceneCam: React.FC<{ frames: number; bake?: boolean; children: React.ReactNode }> = ({ frames, bake, children }) => {
   const f = useCurrentFrame();
   const inn = ease(f, 0, 18, EASE_OUT);
   const out = ease(f, frames - 10, frames, EASE_IN_OUT);
@@ -183,10 +183,10 @@ const SceneCam: React.FC<{ frames: number; children: React.ReactNode }> = ({ fra
         style={{
           justifyContent: "center", alignItems: "center", top: 470, bottom: 470, height: "auto",
           transform: `translateZ(${z}px) scale(${scale}) rotateX(${(1 - inn) * 8}deg)`,
-          filter: `blur(${blur}px)`, opacity: Math.min(inn * 1.6, 1 - out),
+          filter: blur > 0.3 ? `blur(${blur}px)` : "none", opacity: Math.min(inn * 1.6, 1 - out),
         }}
       >
-        <div style={{ filter: `drop-shadow(0 0 22px ${C.glow}) drop-shadow(0 30px 30px ${C.shadow})` }}>{children}</div>
+        <div style={{ filter: bake ? "none" : `drop-shadow(0 0 22px ${C.glow}) drop-shadow(0 30px 30px ${C.shadow})` }}>{children}</div>
       </AbsoluteFill>
     </AbsoluteFill>
   );
@@ -278,7 +278,7 @@ const Body: React.FC<{ p: EpisodeProps }> = ({ p }) => (
     <Paper />
     {p.scenes.map((s, i) => (
       <Sequence key={i} from={s.from} durationInFrames={s.frames} name={`مشهد ${i + 1}`}>
-        <SceneCam frames={s.frames}>
+        <SceneCam frames={s.frames} bake={s.visual.type === "asset"}>
           <VisualView v={s.visual} />
         </SceneCam>
         <Captions words={s.words} frames={s.frames} />
@@ -298,7 +298,7 @@ export const Episode: React.FC<EpisodeProps> = (p) => {
   return (
   <AbsoluteFill>
     {p.motionBlur ? (
-      <CameraMotionBlur shutterAngle={180} samples={6}>
+      <CameraMotionBlur shutterAngle={180} samples={4}>
         <Body p={p} />
       </CameraMotionBlur>
     ) : (

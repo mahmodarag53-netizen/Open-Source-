@@ -293,8 +293,8 @@ const AssetScene: React.FC<{ v: Visual }> = ({ v }) => {
   return (
     <div style={{ position: "relative", width: W, height: H, transform: `translateX(${shake}px)` }}>
       <Img
-        src={staticFile(v.asset!)}
-        style={{ position: "absolute", inset: 0, width: W, height: H, transform: `scale(${push * 1.25})`, transformOrigin: `${fx * 100}% ${fy * 100}%`, filter: "blur(28px) brightness(0.7)", opacity: 0.55, maskImage: mask, WebkitMaskImage: mask }}
+        src={staticFile(v.asset!.replace(/\.png$/, "_blur.jpg"))}
+        style={{ position: "absolute", inset: 0, width: W, height: H, transform: `scale(${push * 1.25})`, transformOrigin: `${fx * 100}% ${fy * 100}%`, opacity: 0.55, maskImage: mask, WebkitMaskImage: mask }}
       />
       <div style={{ position: "absolute", inset: 0, transform: `scale(${push})`, transformOrigin: `${fx * 100}% ${fy * 100}%` }}>
         <Img src={staticFile(v.asset!)} style={{ width: W, height: H, maskImage: mask, WebkitMaskImage: mask, mixBlendMode: "lighten" }} />
