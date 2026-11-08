@@ -11,6 +11,7 @@ export type Visual = {
   tags?: { text: string; x: number; y: number; accent?: boolean }[];
   packets?: { from: [number, number]; to: [number, number]; lift?: number };
   shake?: boolean;
+  width?: number;
   icon?: string;
   state?: string;
   label?: string;
@@ -282,7 +283,7 @@ const BigText: React.FC<{ v: Visual }> = ({ v }) => {
 const AssetScene: React.FC<{ v: Visual }> = ({ v }) => {
   const f = useCurrentFrame();
   const { durationInFrames } = useVideoConfig();
-  const W = 1420;
+  const W = v.width ?? 1300;
   const H = Math.round(W * (768 / 1376));
   const [fx, fy] = v.focus ?? [0.5, 0.5];
   const [z0, z1] = v.zoom ?? [1.0, 1.12];
@@ -314,7 +315,7 @@ const AssetScene: React.FC<{ v: Visual }> = ({ v }) => {
       {(v.tags ?? []).map((t, i) => {
         const o = ease(f, 14 + i * 8, 30 + i * 8, EASE_BACK);
         return (
-          <div key={i} style={{ position: "absolute", left: t.x * W, top: t.y * H, transform: `translate(-50%,-50%) scale(${0.6 + 0.4 * o})`, opacity: o }}>
+          <div key={i} style={{ position: "absolute", left: Math.min(W - 190, Math.max(190, t.x * W)), top: t.y * H, transform: `translate(-50%,-50%) scale(${0.6 + 0.4 * o})`, opacity: o, whiteSpace: "nowrap" }}>
             <Chip text={t.text} color={t.accent ? C.orange : C.ink} size={44} o={1} />
           </div>
         );
