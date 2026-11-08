@@ -3,6 +3,7 @@ import { Img, interpolate, staticFile, useCurrentFrame, useVideoConfig } from "r
 import { Icon } from "./icons";
 import { LagScene } from "./scenes/LagScene";
 import { LagFlat } from "./scenes/LagFlat";
+import { FixScene, HardCabinetScene, RamDeskScene, RamOverflowScene, SwapScene } from "./scenes/Ep01Flat";
 import type { Word } from "./Episode";
 import { C, EASE_BACK, EASE_IN_OUT, EASE_OUT, FONT_HEAVY, FONT_UI, isFlat } from "./theme";
 
@@ -341,6 +342,16 @@ export const VisualView: React.FC<{ v: Visual; words?: Word[] }> = ({ v, words =
     case "steps": return <Steps v={v} />;
     case "bigtext": return <BigText v={v} />;
     case "asset": return <AssetScene v={v} />;
-    case "custom": return v.scene === "lag" ? (isFlat() ? <LagFlat words={words} /> : <LagScene words={words} />) : null;
+    case "custom": {
+      const map: Record<string, React.ReactNode> = {
+        lag: isFlat() ? <LagFlat words={words} /> : <LagScene words={words} />,
+        ramDesk: <RamDeskScene words={words} />,
+        ramOverflow: <RamOverflowScene words={words} />,
+        hardCabinet: <HardCabinetScene words={words} />,
+        swap: <SwapScene words={words} />,
+        fix: <FixScene words={words} />,
+      };
+      return <>{map[v.scene ?? ""] ?? null}</>;
+    }
   }
 };
