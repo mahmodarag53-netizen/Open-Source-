@@ -9,15 +9,15 @@ import type { Word } from "../Episode";
  * One continuous world: the same desk (RAM) and cabinet (HDD).
  * ==================================================================== */
 
-const ease = (f: number, a: number, b: number, e = EASE_OUT) =>
+export const ease = (f: number, a: number, b: number, e = EASE_OUT) =>
   interpolate(f, [a, b], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: e });
-const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
-const rnd = (i: number) => {
+export const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+export const rnd = (i: number) => {
   const x = Math.sin(i * 127.1 + 311.7) * 43758.5453;
   return x - Math.floor(x);
 };
 
-const useCue = (words: Word[]) => {
+export const useCue = (words: Word[]) => {
   const { fps } = useVideoConfig();
   return (needle: string, fallback: number) => {
     const w = words.find((x) => x.w.includes(needle));
@@ -28,7 +28,7 @@ const useCue = (words: Word[]) => {
 /* ---------------- shared building blocks ---------------- */
 
 /** Camera rig: far parallax layer + main layer, slow push, optional punch. */
-const Rig: React.FC<{ s: number; x: number; y: number; children: React.ReactNode }> = ({ s, x, y, children }) => {
+export const Rig: React.FC<{ s: number; x: number; y: number; children: React.ReactNode }> = ({ s, x, y, children }) => {
   const f = useCurrentFrame();
   return (
     <div style={{ position: "relative", width: 1000, height: 1000 }}>
@@ -46,7 +46,7 @@ const Rig: React.FC<{ s: number; x: number; y: number; children: React.ReactNode
   );
 };
 
-const HATCH = (
+export const HATCH = (
   <defs>
     <pattern id="hatch2" width="14" height="14" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
       <line x1="0" y1="0" x2="0" y2="14" stroke={C.inkSoft} strokeWidth="4" />
@@ -55,7 +55,7 @@ const HATCH = (
 );
 
 /** The work desk (= RAM). `w` = top width, centred on cx. */
-const Desk: React.FC<{ cx: number; top: number; w: number; draw: number; tint?: number }> = ({ cx, top, w, draw, tint = 0 }) => (
+export const Desk: React.FC<{ cx: number; top: number; w: number; draw: number; tint?: number }> = ({ cx, top, w, draw, tint = 0 }) => (
   <svg width={1000} height={1000} viewBox="0 0 1000 1000" style={{ position: "absolute", inset: 0, overflow: "visible" }}>
     {HATCH}
     <rect x={cx - w / 2 + 14} y={top + 40} width={w - 28} height={18} rx={9} fill="url(#hatch2)" opacity={draw * 0.8} />
@@ -66,7 +66,7 @@ const Desk: React.FC<{ cx: number; top: number; w: number; draw: number; tint?: 
 );
 
 /** Small program "toolbox" card that sits on the desk. */
-const Tool: React.FC<{ kind: number; hot?: number }> = ({ kind, hot = 0 }) => {
+export const Tool: React.FC<{ kind: number; hot?: number }> = ({ kind, hot = 0 }) => {
   const accent = [C.olive, C.orange, C.blue, C.olive][kind % 4];
   return (
     <div style={{ width: 120, height: 86, borderRadius: 14, background: C.white, border: `5px solid ${C.ink}`, boxShadow: `7px 7px 0 ${hot > 0.5 ? C.orange : accent}`, overflow: "hidden" }}>
@@ -84,7 +84,7 @@ const Tool: React.FC<{ kind: number; hot?: number }> = ({ kind, hot = 0 }) => {
 };
 
 /** Hanging sign on a rope that drops and swings. */
-const Sign: React.FC<{ text: string; x: number; y: number; t0: number; accent?: boolean }> = ({ text, x, y, t0, accent }) => {
+export const Sign: React.FC<{ text: string; x: number; y: number; t0: number; accent?: boolean }> = ({ text, x, y, t0, accent }) => {
   const f = useCurrentFrame();
   const d = ease(f, t0, t0 + 16, EASE_BACK);
   if (f < t0) return null;
@@ -100,7 +100,7 @@ const Sign: React.FC<{ text: string; x: number; y: number; t0: number; accent?: 
 };
 
 /** Big storage cabinet (= HDD). doors 0→1 opens. */
-const Cabinet: React.FC<{ cx: number; bottom: number; s: number; draw: number; doors: number; glow?: number }> = ({ cx, bottom, s, draw, doors, glow = 0 }) => {
+export const Cabinet: React.FC<{ cx: number; bottom: number; s: number; draw: number; doors: number; glow?: number }> = ({ cx, bottom, s, draw, doors, glow = 0 }) => {
   const W = 300;
   const H = 440;
   return (
@@ -129,7 +129,7 @@ const Cabinet: React.FC<{ cx: number; bottom: number; s: number; draw: number; d
   );
 };
 
-const Stamp: React.FC<{ text: string; x: number; y: number; t0: number; rot?: number; size?: number }> = ({ text, x, y, t0, rot = -8, size = 70 }) => {
+export const Stamp: React.FC<{ text: string; x: number; y: number; t0: number; rot?: number; size?: number }> = ({ text, x, y, t0, rot = -8, size = 70 }) => {
   const f = useCurrentFrame();
   if (f < t0) return null;
   const d = ease(f, t0, t0 + 10, EASE_BACK);
