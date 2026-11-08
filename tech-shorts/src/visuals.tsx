@@ -2,8 +2,9 @@ import React from "react";
 import { Img, interpolate, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
 import { Icon } from "./icons";
 import { LagScene } from "./scenes/LagScene";
+import { LagFlat } from "./scenes/LagFlat";
 import type { Word } from "./Episode";
-import { C, EASE_BACK, EASE_IN_OUT, EASE_OUT, FONT_HEAVY, FONT_UI } from "./theme";
+import { C, EASE_BACK, EASE_IN_OUT, EASE_OUT, FONT_HEAVY, FONT_UI, isFlat } from "./theme";
 
 export type Visual = {
   type: "hero" | "desk" | "compare" | "flow" | "bars" | "steps" | "bigtext" | "asset" | "custom";
@@ -38,11 +39,14 @@ export type Visual = {
 const ease = (f: number, a: number, b: number, e = EASE_OUT) =>
   interpolate(f, [a, b], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: e });
 
-const glass = (accent: string, strong = false): React.CSSProperties => ({
+const glass = (accent: string, strong = false): React.CSSProperties =>
+  isFlat()
+    ? { background: C.white, border: `5px solid ${C.ink}`, boxShadow: `${strong ? 14 : 9}px ${strong ? 14 : 9}px 0 ${accent === C.ink || accent.startsWith("rgba") ? C.oliveSoft : accent}` }
+    : {
   background: "linear-gradient(160deg, rgba(34,58,92,0.72), rgba(10,20,36,0.88))",
   border: `2px solid ${accent}`,
   boxShadow: `0 0 ${strong ? 40 : 22}px ${accent === C.orange ? C.glow2 : C.glow}, inset 0 0 26px rgba(63,211,240,0.10)`,
-});
+};
 
 /** Isometric glowing pedestal — real CSS 3D plane under hero objects. */
 const Platform: React.FC<{ w: number; f: number; o: number }> = ({ w, f, o }) => (
@@ -75,7 +79,7 @@ const Hero: React.FC<{ v: Visual }> = ({ v }) => {
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 30 }}>
       <div style={{ position: "relative", transformStyle: "preserve-3d" }}>
-        <Platform w={560} f={f} o={ease(f, 0, 26, EASE_OUT)} />
+        {!isFlat() && <Platform w={560} f={f} o={ease(f, 0, 26, EASE_OUT)} />}
         <div style={{ transform: `translateY(${float - 40}px) scale(${pop})` }}>
           <Icon name={v.icon!} size={720} d={d} f={f} state={v.state} />
         </div>
@@ -337,6 +341,6 @@ export const VisualView: React.FC<{ v: Visual; words?: Word[] }> = ({ v, words =
     case "steps": return <Steps v={v} />;
     case "bigtext": return <BigText v={v} />;
     case "asset": return <AssetScene v={v} />;
-    case "custom": return v.scene === "lag" ? <LagScene words={words} /> : null;
+    case "custom": return v.scene === "lag" ? (isFlat() ? <LagFlat words={words} /> : <LagScene words={words} />) : null;
   }
 };

@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, interpolate, Sequence, staticFile, useCurrentFrame } from "remotion";
 import { Audio } from "@remotion/media";
 import { CameraMotionBlur } from "@remotion/motion-blur";
-import { BRAND, C, EASE_BACK, EASE_IN_OUT, EASE_OUT, FONT_HEAVY, FONT_UI, FPS, setPalette } from "./theme";
+import { BRAND, C, EASE_BACK, EASE_IN_OUT, EASE_OUT, FONT_HEAVY, FONT_TITLE, FONT_UI, FPS, isFlat, setPalette } from "./theme";
 import { Visual, VisualView } from "./visuals";
 
 export type Word = { w: string; start: number; end: number };
@@ -26,6 +26,79 @@ export const PAD = 0.32; // seconds of air after each VO line
 
 const ease = (f: number, a: number, b: number, e = EASE_OUT) =>
   interpolate(f, [a, b], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: e });
+
+/* ================= FLAT LOOK (style C — editorial illustration, like the reference channel) ================= */
+const PaperFlat: React.FC = () => {
+  const f = useCurrentFrame();
+  const x = Math.sin(f / 140) * 14;
+  const y = (f * 0.25) % 48;
+  return (
+    <AbsoluteFill style={{ backgroundColor: C.paper, overflow: "hidden" }}>
+      <AbsoluteFill style={{ inset: -120, backgroundImage: `radial-gradient(${C.grid} 3px, transparent 3.5px)`, backgroundSize: "48px 48px", transform: `translate(${x}px, ${-y}px)` }} />
+      <AbsoluteFill style={{ backgroundImage: `url(${staticFile("fx/grain.png")})`, backgroundSize: "512px 512px", backgroundPosition: `${(f * 137) % 512}px ${(f * 251) % 512}px`, opacity: 0.08, mixBlendMode: "overlay" }} />
+      <AbsoluteFill style={{ background: `radial-gradient(ellipse at 50% 45%, transparent 50%, ${C.vignette} 100%)` }} />
+    </AbsoluteFill>
+  );
+};
+
+const NearPlaneFlat: React.FC = () => {
+  const f = useCurrentFrame();
+  const o = ease(f, 6, 30);
+  const p = (k: number) => Math.sin(f / k);
+  return (
+    <AbsoluteFill style={{ pointerEvents: "none" }}>
+      <div style={{ position: "absolute", left: -90 + p(50) * 26, top: 330 + p(70) * 30, width: 230, height: 230, borderRadius: "50%", background: C.olive, opacity: 0.85 * o, filter: "blur(8px)" }} />
+      <div style={{ position: "absolute", right: -110 + p(60) * 22, top: 1180 + p(45) * 34, width: 260, height: 260, borderRadius: "50%", border: `10px solid ${C.blue}`, opacity: 0.8 * o, filter: "blur(6px)" }} />
+      <div style={{ position: "absolute", right: -40 + p(40) * 18, top: 1240 + p(45) * 34, width: 120, height: 120, borderRadius: "50%", background: C.orange, opacity: 0.9 * o, filter: "blur(5px)" }} />
+    </AbsoluteFill>
+  );
+};
+
+const MarkFlat: React.FC<{ size: number }> = ({ size }) => (
+  <div style={{ width: size, height: size, borderRadius: size * 0.28, background: C.orange, color: C.paper, display: "flex", justifyContent: "center", alignItems: "center", fontFamily: FONT_TITLE, fontWeight: 700, fontSize: size * 0.72, paddingBottom: size * 0.12, boxShadow: `${size * 0.08}px ${size * 0.08}px 0 ${C.shadow}` }}>
+    ؟
+  </div>
+);
+
+const FrameFlat: React.FC<{ p: EpisodeProps }> = ({ p }) => {
+  const f = useCurrentFrame();
+  const o = ease(f, 0, 18);
+  return (
+    <AbsoluteFill style={{ pointerEvents: "none" }}>
+      <div style={{ position: "absolute", inset: 34, border: `3px solid ${C.ink}`, borderRadius: 26, opacity: 0.35 * o }} />
+      <div style={{ position: "absolute", top: 66, left: 78, display: "flex", alignItems: "center", gap: 16, opacity: o, direction: "rtl" }}>
+        <div style={{ fontFamily: FONT_TITLE, fontWeight: 700, fontSize: 36, color: C.ink }}>{BRAND.series}</div>
+        <MarkFlat size={50} />
+      </div>
+      <div style={{ position: "absolute", top: 70, right: 78, fontFamily: FONT_UI, fontWeight: 600, fontSize: 30, color: C.orange, border: `3px solid ${C.orange}`, borderRadius: 999, padding: "4px 22px 8px", opacity: o, direction: "rtl" }}>
+        {p.category}
+      </div>
+      <div style={{ position: "absolute", top: 1378, left: 0, right: 0, textAlign: "center", fontFamily: FONT_UI, fontSize: 30, color: C.dim, direction: "rtl", opacity: o * (1 - ease(f, p.outroFrom - 6, p.outroFrom + 6)) }}>
+        {BRAND.series} · {BRAND.author}
+      </div>
+    </AbsoluteFill>
+  );
+};
+
+const OutroFlat: React.FC<{ p: EpisodeProps }> = ({ p }) => {
+  const f = useCurrentFrame();
+  const a = ease(f, 0, 20, EASE_BACK);
+  const b = ease(f, 14, 34, EASE_OUT);
+  return (
+    <AbsoluteFill style={{ justifyContent: "center", alignItems: "center", top: 300 }}>
+      <div style={{ fontFamily: FONT_TITLE, fontWeight: 700, fontSize: 82, color: C.ink, direction: "rtl", textAlign: "center", lineHeight: 1.5, background: C.white, border: `7px solid ${C.ink}`, borderRadius: 34, padding: "34px 54px 50px", maxWidth: 900, boxShadow: `16px 16px 0 ${C.orange}`, transform: `scale(${interpolate(a, [0, 1], [0.7, 1])}) rotate(${(1 - a) * 4}deg)`, opacity: Math.min(1, a * 1.4) }}>
+        {p.punchline}
+      </div>
+      <div style={{ marginTop: 90, display: "flex", alignItems: "center", gap: 26, direction: "rtl", opacity: b, transform: `translateY(${(1 - b) * 40}px)` }}>
+        <MarkFlat size={120} />
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          <div style={{ fontFamily: FONT_TITLE, fontWeight: 700, fontSize: 58, color: C.ink }}>{BRAND.series}</div>
+          <div style={{ fontFamily: FONT_UI, fontSize: 34, color: C.inkSoft }}>إعداد وتقديم: {BRAND.author}</div>
+        </div>
+      </div>
+    </AbsoluteFill>
+  );
+};
 
 /* ---------- background: night navy, perspective circuit floor, grain (far plane) ---------- */
 const Paper: React.FC = () => {
@@ -143,7 +216,7 @@ const Title: React.FC<{ p: EpisodeProps }> = ({ p }) => {
   return (
     <div style={{ position: "absolute", top: 170, left: 0, right: 0, display: "flex", flexDirection: "column", alignItems: "center" }}>
       {p.titleLines.map((l, li) => (
-        <div key={li} style={{ fontFamily: FONT_HEAVY, fontWeight: 800, fontSize: 108, lineHeight: 1.35, direction: "rtl", whiteSpace: "nowrap" }}>
+        <div key={li} style={{ fontFamily: isFlat() ? FONT_TITLE : FONT_HEAVY, fontWeight: isFlat() ? 700 : 800, fontSize: isFlat() ? 100 : 108, lineHeight: isFlat() ? 1.45 : 1.35, direction: "rtl", whiteSpace: "nowrap" }}>
           {l.split(" ").map((w, i) => {
             const at = 2 + k++ * 5;
             const o = ease(f, at, at + 14, EASE_OUT);
@@ -153,7 +226,7 @@ const Title: React.FC<{ p: EpisodeProps }> = ({ p }) => {
                 key={i}
                 style={{
                   display: "inline-block", color: hit ? C.orange : C.title, opacity: o, margin: "0 12px",
-                  textShadow: `0 0 26px ${hit ? C.glow2 : "rgba(238,221,166,0.25)"}, 0 6px 0 rgba(0,0,0,0.45)`,
+                  textShadow: isFlat() ? "none" : `0 0 26px ${hit ? C.glow2 : "rgba(238,221,166,0.25)"}, 0 6px 0 rgba(0,0,0,0.45)`,
                   transform: `translateY(${(1 - o) * 50}px) scale(${0.9 + 0.1 * o})`, filter: `blur(${(1 - o) * 12}px)`,
                 }}
               >
@@ -163,7 +236,7 @@ const Title: React.FC<{ p: EpisodeProps }> = ({ p }) => {
           })}
         </div>
       ))}
-      
+      {isFlat() && <div style={{ marginTop: 10, height: 6, width: 200 * ease(f, 16, 40, EASE_IN_OUT), background: C.orange, borderRadius: 3 }} />}
     </div>
   );
 };
@@ -186,7 +259,7 @@ const SceneCam: React.FC<{ frames: number; bake?: boolean; children: React.React
           filter: blur > 0.3 ? `blur(${blur}px)` : "none", opacity: Math.min(inn * 1.6, 1 - out),
         }}
       >
-        <div style={{ filter: bake ? "none" : `drop-shadow(0 0 22px ${C.glow}) drop-shadow(0 30px 30px ${C.shadow})` }}>{children}</div>
+        <div style={{ filter: bake ? "none" : isFlat() ? `drop-shadow(12px 14px 0 ${C.shadow})` : `drop-shadow(0 0 22px ${C.glow}) drop-shadow(0 30px 30px ${C.shadow})` }}>{children}</div>
       </AbsoluteFill>
     </AbsoluteFill>
   );
@@ -276,7 +349,7 @@ const Outro: React.FC<{ p: EpisodeProps }> = ({ p }) => {
 
 const Body: React.FC<{ p: EpisodeProps }> = ({ p }) => (
   <AbsoluteFill>
-    <Paper />
+    {isFlat() ? <PaperFlat /> : <Paper />}
     {p.scenes.map((s, i) => (
       <Sequence key={i} from={s.from} durationInFrames={s.frames} name={`مشهد ${i + 1}`}>
         <SceneCam frames={s.frames} bake={s.visual.type === "asset" || s.visual.type === "custom"}>
@@ -286,11 +359,11 @@ const Body: React.FC<{ p: EpisodeProps }> = ({ p }) => (
       </Sequence>
     ))}
     <Sequence from={p.outroFrom} name="الخاتمة">
-      <Outro p={p} />
+      {isFlat() ? <OutroFlat p={p} /> : <Outro p={p} />}
     </Sequence>
     <Title p={p} />
-    <Frame p={p} />
-    <NearPlane />
+    {isFlat() ? <FrameFlat p={p} /> : <Frame p={p} />}
+    {isFlat() ? <NearPlaneFlat /> : <NearPlane />}
   </AbsoluteFill>
 );
 

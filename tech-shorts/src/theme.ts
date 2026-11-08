@@ -9,6 +9,7 @@ const RLA = "U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02
 export const FONT_TITLE = "Naskh";
 export const FONT_UI = "Readex";
 export const FONT_HEAVY = "CairoX";
+export const isFlat = () => C.glow === "transparent";
 for (const [family, file, weight, unicodeRange] of [
   [FONT_TITLE, "naskh-700-arabic", "700", AR],
   [FONT_TITLE, "naskh-700-latin", "700", LA],
@@ -56,7 +57,7 @@ export const PALETTES: Record<string, Palette> = {
     paper: "#0F2436", grid: "#1C3448", ink: "#F1EEE5", inkSoft: "#93A3B1", orange: "#FFD43B", orangeSoft: "#8A7424",
     olive: "#62D9B5", oliveSoft: "#2A5E57", sand: "#183044", blue: "#F59AC0", blueSoft: "#6A3E57", white: "#152C40",
     shadow: "rgba(0,0,0,0.5)", vignette: "rgba(0,8,16,0.6)", dim: "rgba(241,238,229,0.35)",
-    title: "", glow: "transparent", glow2: "transparent",
+    title: "#F1EEE5", glow: "transparent", glow2: "transparent",
   },
 };
 
