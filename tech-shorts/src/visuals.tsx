@@ -1,10 +1,13 @@
 import React from "react";
 import { Img, interpolate, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
 import { Icon } from "./icons";
+import { LagScene } from "./scenes/LagScene";
+import type { Word } from "./Episode";
 import { C, EASE_BACK, EASE_IN_OUT, EASE_OUT, FONT_HEAVY, FONT_UI } from "./theme";
 
 export type Visual = {
-  type: "hero" | "desk" | "compare" | "flow" | "bars" | "steps" | "bigtext" | "asset";
+  type: "hero" | "desk" | "compare" | "flow" | "bars" | "steps" | "bigtext" | "asset" | "custom";
+  scene?: string;
   asset?: string;
   focus?: [number, number];
   zoom?: [number, number];
@@ -324,7 +327,7 @@ const AssetScene: React.FC<{ v: Visual }> = ({ v }) => {
   );
 };
 
-export const VisualView: React.FC<{ v: Visual }> = ({ v }) => {
+export const VisualView: React.FC<{ v: Visual; words?: Word[] }> = ({ v, words = [] }) => {
   switch (v.type) {
     case "hero": return <Hero v={v} />;
     case "desk": return <Desk v={v} />;
@@ -334,5 +337,6 @@ export const VisualView: React.FC<{ v: Visual }> = ({ v }) => {
     case "steps": return <Steps v={v} />;
     case "bigtext": return <BigText v={v} />;
     case "asset": return <AssetScene v={v} />;
+    case "custom": return v.scene === "lag" ? <LagScene words={words} /> : null;
   }
 };

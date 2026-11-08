@@ -208,7 +208,8 @@ const Captions: React.FC<{ words: Word[]; frames: number }> = ({ words, frames }
     }
   });
   if (cur.length) chunks.push(cur);
-  const idx = Math.max(0, chunks.findIndex((c) => t < c[c.length - 1].end + 0.05));
+  const found = chunks.findIndex((c) => t < c[c.length - 1].end + 0.05);
+  const idx = found === -1 ? chunks.length - 1 : found;
   const chunk = chunks[idx === -1 ? chunks.length - 1 : idx];
   const cStart = chunk[0].start * FPS;
   const o = ease(f, cStart - 2, cStart + 6) * (1 - ease(f, frames - 8, frames));
@@ -278,8 +279,8 @@ const Body: React.FC<{ p: EpisodeProps }> = ({ p }) => (
     <Paper />
     {p.scenes.map((s, i) => (
       <Sequence key={i} from={s.from} durationInFrames={s.frames} name={`مشهد ${i + 1}`}>
-        <SceneCam frames={s.frames} bake={s.visual.type === "asset"}>
-          <VisualView v={s.visual} />
+        <SceneCam frames={s.frames} bake={s.visual.type === "asset" || s.visual.type === "custom"}>
+          <VisualView v={s.visual} words={s.words} />
         </SceneCam>
         <Captions words={s.words} frames={s.frames} />
       </Sequence>

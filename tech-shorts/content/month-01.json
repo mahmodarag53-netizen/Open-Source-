@@ -19,17 +19,8 @@
         {
           "vo": "بتعرف شو أكتر سؤال بيجيني؟ ليش الكمبيوتر بيعلّق؟ والجواب، أبسط مما بتتخيّل.",
           "visual": {
-            "type": "asset",
-            "asset": "assets/ep01/s01_monitor.png",
-            "focus": [
-              0.55,
-              0.45
-            ],
-            "zoom": [
-              1.0,
-              1.18
-            ],
-            "shake": true
+            "type": "custom",
+            "scene": "lag"
           }
         },
         {
