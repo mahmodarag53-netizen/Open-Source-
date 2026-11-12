@@ -4,6 +4,7 @@ import month from "../content/month-01.json";
 import { Episode, EpisodeProps, INTRO, OUTRO, PAD, Word } from "./Episode";
 import { FPS, H, W } from "./theme";
 import type { Visual } from "./visuals";
+import { AdobeNews, NEWS_FRAMES } from "./news/AdobeNews";
 
 type Ch = { text: string; start_time: number; end_time: number };
 
@@ -74,5 +75,6 @@ export const RemotionRoot: React.FC = () => (
         }}
       />
     ))}
+    <Composition id="adobe-news" component={AdobeNews} fps={FPS} width={W} height={H} durationInFrames={NEWS_FRAMES} defaultProps={{ motionBlur: true }} />
   </>
 );
